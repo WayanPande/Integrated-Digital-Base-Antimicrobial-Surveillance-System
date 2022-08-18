@@ -10,6 +10,7 @@ class AuthenticationHeader extends StatelessWidget {
     return Container(
       width: double.infinity,
       height: 400,
+      clipBehavior: Clip.hardEdge,
       decoration: const BoxDecoration(
         color: Color(0xFF20BDB7),
         borderRadius: BorderRadius.only(
@@ -20,9 +21,10 @@ class AuthenticationHeader extends StatelessWidget {
       child: SafeArea(
         child: Stack(
           children: [
-            Icon(
+             Icon(
               Icons.heart_broken,
-              size: 300,
+              size: 600,
+              color: Colors.white.withOpacity(0.1),
             ),
             Padding(
               padding: const EdgeInsets.symmetric(

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:project_pak_gusan/screens/login_screen.dart';
 
 import '../util/data_drop_down.dart';
+import '../widget/authentication_header.dart';
 
 class RegisterScreen extends StatefulWidget {
   const RegisterScreen({Key? key}) : super(key: key);
@@ -25,63 +26,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
       body: SingleChildScrollView(
         child: Column(
           children: [
-            Container(
-              width: double.infinity,
-              height: 400,
-              decoration: const BoxDecoration(
-                color: Color(0xFF20BDB7),
-                borderRadius: BorderRadius.only(
-                  bottomLeft: Radius.circular(25),
-                  bottomRight: Radius.circular(25),
-                ),
-              ),
-              child: SafeArea(
-                child: Stack(
-                  children: [
-                    Icon(
-                      Icons.heart_broken,
-                      size: 300,
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 30,
-                        vertical: 60,
-                      ),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: const [
-                          Icon(
-                            Icons.heart_broken,
-                            size: 40,
-                            color: Colors.white,
-                          ),
-                          SizedBox(
-                            height: 12,
-                          ),
-                          Text(
-                            "Sign up.",
-                            style: TextStyle(
-                              fontWeight: FontWeight.bold,
-                              fontSize: 40,
-                              color: Colors.white,
-                            ),
-                          ),
-                          SizedBox(
-                            height: 12,
-                          ),
-                          Text(
-                            "Sign up your new account",
-                            style: TextStyle(
-                              fontSize: 16,
-                              color: Colors.white,
-                            ),
-                          )
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-              ),
+            const AuthenticationHeader(
+              title: "Sign up.",
+              description: "Sign up your new account",
             ),
             Padding(
               padding: const EdgeInsets.all(40),
