@@ -32,6 +32,7 @@ class MyApp extends StatelessWidget {
         primaryColor: const Color(0xFFbfeb91),
         primarySwatch: kToDark,
       ),
+      debugShowCheckedModeBanner: false,
       home: const LoginScreen(),
     );
   }
