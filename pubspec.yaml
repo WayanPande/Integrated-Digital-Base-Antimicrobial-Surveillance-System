@@ -37,6 +37,7 @@ dependencies:
   intl: ^0.17.0
   multi_select_flutter: ^4.1.2
   awesome_dialog: ^3.0.0
+  faker: ^2.0.0
 
 dev_dependencies:
   flutter_test:
