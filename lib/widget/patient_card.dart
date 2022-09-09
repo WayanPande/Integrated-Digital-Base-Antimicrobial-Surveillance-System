@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:project_pak_gusan/screens/profile_patien_screen.dart';
 
 class PatienCard extends StatelessWidget {
-  const PatienCard({Key? key}) : super(key: key);
+  final String name, umur;
+
+  const PatienCard({Key? key, required this.name, required this.umur}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -17,7 +19,7 @@ class PatienCard extends StatelessWidget {
             context,
             MaterialPageRoute(
               builder: (context) {
-                return const ProfilePatienScreen();
+                return ProfilePatienScreen(name: name, umur: umur,);
               },
             ),
           );
@@ -36,9 +38,9 @@ class PatienCard extends StatelessWidget {
                     width: 30,
                     height: 30,
                     decoration: BoxDecoration(
-                      image: const DecorationImage(
+                      image:  DecorationImage(
                         image: NetworkImage(
-                          "https://avatars.dicebear.com/api/adventurer-neutral/joko.jpg",
+                          "https://avatars.dicebear.com/api/adventurer-neutral/${name}.jpg",
                         ),
                       ),
                       borderRadius: BorderRadius.circular(8),
@@ -51,8 +53,8 @@ class PatienCard extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        "I Wayan Pande Putra Yudha",
-                        style: TextStyle(
+                        name,
+                        style: const TextStyle(
                           fontWeight: FontWeight.w600,
                           fontSize: 15,
                         ),
@@ -61,8 +63,8 @@ class PatienCard extends StatelessWidget {
                         height: 8,
                       ),
                       Text(
-                        "24 th",
-                        style: TextStyle(
+                        "${umur} th",
+                        style: const TextStyle(
                           color: Colors.grey,
                         ),
                       ),
