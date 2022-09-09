@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:multi_select_flutter/dialog/multi_select_dialog_field.dart';
 import 'package:multi_select_flutter/util/multi_select_item.dart';
 import 'package:project_pak_gusan/screens/add_patien_antibiotik_screen.dart';
+import 'package:project_pak_gusan/util/data_drop_down.dart';
 
 import '../util/data_class.dart';
 
@@ -50,6 +51,8 @@ class _AddPatienRiwayatState extends State<AddPatienRiwayat> {
     Data(id: 3, name: "Darah"),
   ];
 
+  static List<Data> namaAntibiotik = [];
+
   final _itemsJenisPerawatan = jenisPerawatan
       .map((data) => MultiSelectItem<Data>(data, data.name))
       .toList();
@@ -57,6 +60,22 @@ class _AddPatienRiwayatState extends State<AddPatienRiwayat> {
   final _itemsJenisSpesimen = jenisSpesimen
       .map((data) => MultiSelectItem<Data>(data, data.name))
       .toList();
+
+  final _itemsNamaAntibiotik = namaAntibiotik
+      .map((data) => MultiSelectItem<Data>(data, data.name))
+      .toList();
+
+  convertAntibiotik() {
+    for(var i=0;i<dataAntibiotik.length;i++){
+      namaAntibiotik.add(Data(id: i, name: dataAntibiotik[i]));
+    }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    convertAntibiotik();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -444,7 +463,7 @@ class _AddPatienRiwayatState extends State<AddPatienRiwayat> {
                       height: 10,
                     ),
                     MultiSelectDialogField(
-                      items: _itemsJenisSpesimen,
+                      items: _itemsNamaAntibiotik,
                       decoration: BoxDecoration(
                         border: Border.all(
                           color: Colors.black38,
@@ -453,13 +472,14 @@ class _AddPatienRiwayatState extends State<AddPatienRiwayat> {
                         borderRadius: BorderRadius.circular(15),
                       ),
                       title: const Text(
-                        "Jenis Spesimen",
+                        "Nama Antibiotik",
                       ),
                       buttonIcon: const Icon(
                         Icons.arrow_drop_down,
                       ),
                       selectedColor: const Color(0xFF20BDB7),
                       onConfirm: (index) {},
+                      searchable: true,
                     ),
                   ],
                 ),
