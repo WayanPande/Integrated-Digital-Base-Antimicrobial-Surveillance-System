@@ -15,10 +15,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
   bool isPassShown = false;
   double heightSpacing = 25;
   int _jenisDokter = 1;
-  final List<String> _countrycodes = ["+65", "+91"];
 
   String _selectedCountryCode = "+65";
-  String _selectedKlinik = "Klinik Asih Usadha", _selectedRumahSakit = "RS Bali Royal", _selectedPuskesmas = "Puskesmas I Denpasar Utara", _selectedPoliklinik = "Klinik Utama Dharma Sidhi";
+  String _selectedJenisSpesialis = "Spesialis Akupunktur Medik", _selectedKlinik = "Klinik Asih Usadha", _selectedRumahSakit = "RS Bali Royal", _selectedPuskesmas = "Puskesmas I Denpasar Utara", _selectedPoliklinik = "Klinik Utama Dharma Sidhi";
 
   @override
   Widget build(BuildContext context) {
@@ -166,14 +165,14 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         vertical: 5,
                       ),
                       child: DropdownButton(
-                        value: _selectedCountryCode,
-                        items: _countrycodes
+                        value: _selectedJenisSpesialis,
+                        items: dataSpesialis
                             .map((code) => DropdownMenuItem(
                                 value: code, child: Text(code)))
                             .toList(),
                         onChanged: (index) {
                           setState(() {
-                            _selectedCountryCode = index.toString();
+                            _selectedJenisSpesialis = index.toString();
                           });
                         },
                         isExpanded: true,
