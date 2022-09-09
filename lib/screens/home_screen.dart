@@ -1,3 +1,6 @@
+import 'dart:math';
+
+import 'package:faker/faker.dart';
 import 'package:flutter/material.dart';
 import 'package:project_pak_gusan/screens/add_patien_identitas_screen.dart';
 import 'package:project_pak_gusan/widget/patient_card.dart';
@@ -51,8 +54,17 @@ class _HomeScreenState extends State<HomeScreen> {
                   vertical: 10,
                 ),
                 child: Column(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  mainAxisAlignment: MainAxisAlignment.spaceAround,
                   children: [
+                    const Text(
+                      "Integrated Digital - Base Antimicrobial Surveillance System (IDAAS)",
+                      style: TextStyle(
+                        fontSize: 16,
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold,
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
@@ -159,7 +171,10 @@ class _HomeScreenState extends State<HomeScreen> {
               child: ListView.separated(
                 itemCount: numberList.length,
                 itemBuilder: (BuildContext context, int index) {
-                  return PatienCard();
+                  return PatienCard(
+                    name: Faker().person.name(),
+                    umur: (Random().nextInt(50) + 20).toString(),
+                  );
                 },
                 separatorBuilder: (BuildContext context, int index) {
                   return const SizedBox(
