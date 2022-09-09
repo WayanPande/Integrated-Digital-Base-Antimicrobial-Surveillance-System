@@ -1,6 +1,11 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
-import 'package:project_pak_gusan/widget/patient_card.dart';
+import 'package:project_pak_gusan/util/data_drop_down.dart';
 import 'package:project_pak_gusan/widget/patient_data.dart';
+import 'package:project_pak_gusan/widget/riwayat_pasien_list.dart';
+
+import '../widget/antibiotik_card.dart';
 
 class ProfilePatienScreen extends StatefulWidget {
   const ProfilePatienScreen({Key? key}) : super(key: key);
@@ -10,7 +15,6 @@ class ProfilePatienScreen extends StatefulWidget {
 }
 
 class _ProfilePatienScreenState extends State<ProfilePatienScreen> {
-  final List<int> numberList = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
 
   @override
   Widget build(BuildContext context) {
@@ -161,22 +165,51 @@ class _ProfilePatienScreenState extends State<ProfilePatienScreen> {
               Expanded(
                 child: TabBarView(
                   children: [
-                    Padding(
+                    SingleChildScrollView(
                       padding: const EdgeInsets.only(
-                        top: 10,
+                        top: 30,
+                        left: 10,
+                        right: 10,
                       ),
-                      child: ListView.separated(
-                        shrinkWrap: true,
-                        primary: false,
-                        itemCount: numberList.length,
-                        itemBuilder: (BuildContext context, int index) {
-                          return PatienCard();
-                        },
-                        separatorBuilder: (BuildContext context, int index) {
-                          return const SizedBox(
-                            height: 10,
-                          );
-                        },
+                      child: Column(
+                        children: const [
+                          RiwayatPasienList(
+                            title: "Dx Sementara",
+                            value: "12",
+                          ),
+                          RiwayatPasienList(
+                            title: "Dx Definitif",
+                            value: "12",
+                          ),
+                          RiwayatPasienList(
+                            title: "Jenis Perawatan",
+                            value: "Rawat Jalan",
+                          ),
+                          RiwayatPasienList(
+                            title: "Lama Dirawat",
+                            value: "5 Hari",
+                          ),
+                          RiwayatPasienList(
+                            title: "Tempat Praktek",
+                            value: "Praktek Pribadi",
+                          ),
+                          RiwayatPasienList(
+                            title: "Ruang Rawat",
+                            value: "UGD",
+                          ),
+                          RiwayatPasienList(
+                            title: "Jenis Spesimen Bakteri",
+                            value: "Air Kencing",
+                          ),
+                          RiwayatPasienList(
+                            title: "Hasil Bakteri",
+                            value: "hidrokokus",
+                          ),
+                          RiwayatPasienList(
+                            title: "Nama Antibiotik",
+                            value: "Rolitetracycline",
+                          ),
+                        ],
                       ),
                     ),
                     Padding(
@@ -186,9 +219,12 @@ class _ProfilePatienScreenState extends State<ProfilePatienScreen> {
                       child: ListView.separated(
                         shrinkWrap: true,
                         primary: false,
-                        itemCount: numberList.length,
+                        itemCount: 5,
                         itemBuilder: (BuildContext context, int index) {
-                          return PatienCard();
+                          return AntibiotikCard(
+                            namaAntibiotik: dataAntibiotik[Random().nextInt(200)],
+                            dosis: '10 mg',
+                          );
                         },
                         separatorBuilder: (BuildContext context, int index) {
                           return const SizedBox(
