@@ -57,6 +57,17 @@ class _ProfilePatienScreenState extends State<ProfilePatienScreen> {
           ),
           child: Column(
             children: [
+              const Text(
+                "Integrated Digital - Base Antimicrobial Surveillance System (IDAAS)",
+                style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                ),
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(
+                height: 30,
+              ),
               Row(
                 children: [
                   Container(

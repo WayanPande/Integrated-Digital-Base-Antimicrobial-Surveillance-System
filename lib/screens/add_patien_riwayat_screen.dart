@@ -53,7 +53,6 @@ class _AddPatienRiwayatState extends State<AddPatienRiwayat> {
   static List<Data> namaAntibiotik = [];
 
   convertData() {
-    print("KOCAKAKA");
     if (namaAntibiotik.isEmpty) {
       for (var i = 0; i < dataAntibiotik.length; i++) {
         namaAntibiotik.add(Data(id: i, name: dataAntibiotik[i]));
@@ -103,6 +102,17 @@ class _AddPatienRiwayatState extends State<AddPatienRiwayat> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              const Text(
+                "Integrated Digital - Base Antimicrobial Surveillance System (IDAAS)",
+                style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                ),
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(
+                height: 30,
+              ),
               const Text(
                 "Riwayat Pasien",
                 style: TextStyle(
