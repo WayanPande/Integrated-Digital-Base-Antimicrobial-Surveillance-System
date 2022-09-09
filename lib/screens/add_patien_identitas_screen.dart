@@ -12,9 +12,9 @@ class AddPatienIdentitas extends StatefulWidget {
 class _AddPatienIdentitasState extends State<AddPatienIdentitas> {
   TextEditingController tanggalLahir = TextEditingController();
 
-  final List<String> jenisKelamin = ["Rawat Jalan", "Rawat Inap/Opname", "Meninggal"];
+  final List<String> jenisKelamin = ["Laki - Laki", "Wanita"];
 
-  String _selectedJenisKelamin = "Rawat Jalan";
+  String _selectedJenisKelamin = "Laki - Laki";
 
   @override
   Widget build(BuildContext context) {
