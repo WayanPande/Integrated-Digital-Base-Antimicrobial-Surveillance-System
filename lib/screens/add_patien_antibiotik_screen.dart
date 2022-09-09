@@ -298,328 +298,341 @@ class _AddPatienAntibiotikState extends State<AddPatienAntibiotik> {
               const SizedBox(
                 height: 30,
               ),
-              const Text(
-                "Apakah kombinasi/lebih dari 1 jenis antibiotik secara bersamaan?",
-                style: TextStyle(
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              const SizedBox(
-                height: 12,
-              ),
-              Row(
-                children: [
-                  Row(
-                    children: [
-                      Radio(
-                        value: true,
-                        groupValue: _kombinasiAntibiotik,
-                        activeColor: const Color(0xFF20BDB7),
-                        onChanged: (index) {
-                          setState(() {
-                            _kombinasiAntibiotik = true;
-                          });
-                        },
-                      ),
-                      const Text(
-                        "Ya",
-                      ),
-                    ],
-                  ),
-                  const SizedBox(
-                    width: 15,
-                  ),
-                  Row(
-                    children: [
-                      Radio(
-                        value: false,
-                        groupValue: _kombinasiAntibiotik,
-                        activeColor: const Color(0xFF20BDB7),
-                        onChanged: (index) {
-                          setState(() {
-                            _kombinasiAntibiotik = false;
-                            _namaAntibiotik = [];
-                          });
-                        },
-                      ),
-                      const Text(
-                        "Tidak",
-                      ),
-                    ],
-                  ),
-                ],
-              ),
               Visibility(
-                visible: _kombinasiAntibiotik,
+                visible: _diberikanAntibiotik,
                 child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
+                    const Text(
+                      "Apakah kombinasi/lebih dari 1 jenis antibiotik secara bersamaan?",
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
                     const SizedBox(
-                      height: 15,
+                      height: 12,
+                    ),
+                    Row(
+                      children: [
+                        Row(
+                          children: [
+                            Radio(
+                              value: true,
+                              groupValue: _kombinasiAntibiotik,
+                              activeColor: const Color(0xFF20BDB7),
+                              onChanged: (index) {
+                                setState(() {
+                                  _kombinasiAntibiotik = true;
+                                });
+                              },
+                            ),
+                            const Text(
+                              "Ya",
+                            ),
+                          ],
+                        ),
+                        const SizedBox(
+                          width: 15,
+                        ),
+                        Row(
+                          children: [
+                            Radio(
+                              value: false,
+                              groupValue: _kombinasiAntibiotik,
+                              activeColor: const Color(0xFF20BDB7),
+                              onChanged: (index) {
+                                setState(() {
+                                  _kombinasiAntibiotik = false;
+                                  _namaAntibiotik = [];
+                                });
+                              },
+                            ),
+                            const Text(
+                              "Tidak",
+                            ),
+                          ],
+                        ),
+                      ],
                     ),
                     Visibility(
-                      visible: _namaAntibiotik.isNotEmpty,
+                      visible: _kombinasiAntibiotik,
                       child: Column(
-                        children: const [
-                          Center(
-                            child: Text(
-                              "List antibiotik",
-                              style: TextStyle(
-                                fontWeight: FontWeight.bold,
-                              ),
+                        children: [
+                          const SizedBox(
+                            height: 15,
+                          ),
+                          Visibility(
+                            visible: _namaAntibiotik.isNotEmpty,
+                            child: Column(
+                              children: const [
+                                Center(
+                                  child: Text(
+                                    "List kombinasi antibiotik",
+                                    style: TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                ),
+                                SizedBox(
+                                  height: 10,
+                                ),
+                              ],
                             ),
                           ),
-                          SizedBox(
-                            height: 10,
+                          MultiSelectChipDisplay(
+                            items: _namaAntibiotik
+                                .map((data) =>
+                                    MultiSelectItem<Data>(data, data.name))
+                                .toList(),
+                            chipColor: const Color(0xFF20BDB7).withOpacity(0.6),
+                            textStyle: const TextStyle(
+                              color: Colors.white,
+                            ),
+                            onTap: (values) {
+                              setState(() {
+                                _namaAntibiotik.remove(values);
+                              });
+                            },
+                          ),
+                          const SizedBox(
+                            height: 15,
+                          ),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.end,
+                            children: [
+                              ElevatedButton(
+                                onPressed: () {
+                                  _showMyDialog();
+                                },
+                                style: ElevatedButton.styleFrom(
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(14),
+                                  ),
+                                  padding: const EdgeInsets.symmetric(
+                                    vertical: 15,
+                                    horizontal: 15,
+                                  ),
+                                ),
+                                child: const Text(
+                                  "Tambah antibiotik",
+                                  style: TextStyle(
+                                    color: Colors.white,
+                                  ),
+                                ),
+                              )
+                            ],
                           ),
                         ],
                       ),
                     ),
-                    MultiSelectChipDisplay(
-                      items: _namaAntibiotik
-                          .map((data) => MultiSelectItem<Data>(data, data.name))
-                          .toList(),
-                      onTap: (values) {
-                        setState(() {
-                          _namaAntibiotik.remove(values);
-                        });
-                      },
+                    const SizedBox(
+                      height: 30,
+                    ),
+                    const Text(
+                      "Sebelum pemberian AB, apa sudah pernah konsumsi/mendapatkan AB lain ?",
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
                     const SizedBox(
-                      height: 15,
+                      height: 12,
                     ),
                     Row(
-                      mainAxisAlignment: MainAxisAlignment.end,
                       children: [
-                        ElevatedButton(
-                          onPressed: () {
-                            _showMyDialog();
-                          },
-                          style: ElevatedButton.styleFrom(
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(14),
+                        Row(
+                          children: [
+                            Radio(
+                              value: true,
+                              groupValue: _antibiotikLain,
+                              activeColor: const Color(0xFF20BDB7),
+                              onChanged: (index) {
+                                setState(() {
+                                  _antibiotikLain = true;
+                                });
+                              },
                             ),
-                            padding: const EdgeInsets.symmetric(
-                              vertical: 15,
-                              horizontal: 15,
+                            const Text(
+                              "Ya",
                             ),
-                          ),
-                          child: const Text(
-                            "Tambah antibiotik",
-                            style: TextStyle(
-                              color: Colors.white,
+                          ],
+                        ),
+                        const SizedBox(
+                          width: 15,
+                        ),
+                        Row(
+                          children: [
+                            Radio(
+                              value: false,
+                              groupValue: _antibiotikLain,
+                              activeColor: const Color(0xFF20BDB7),
+                              onChanged: (index) {
+                                setState(() {
+                                  _antibiotikLain = false;
+                                });
+                              },
                             ),
-                          ),
-                        )
+                            const Text(
+                              "Tidak",
+                            ),
+                          ],
+                        ),
                       ],
                     ),
-                  ],
-                ),
-              ),
-              const SizedBox(
-                height: 30,
-              ),
-              const Text(
-                "Sebelum pemberian AB, apa sudah pernah konsumsi/mendapatkan AB lain ?",
-                style: TextStyle(
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              const SizedBox(
-                height: 12,
-              ),
-              Row(
-                children: [
-                  Row(
-                    children: [
-                      Radio(
-                        value: true,
-                        groupValue: _antibiotikLain,
-                        activeColor: const Color(0xFF20BDB7),
-                        onChanged: (index) {
-                          setState(() {
-                            _antibiotikLain = true;
-                          });
-                        },
-                      ),
-                      const Text(
-                        "Ya",
-                      ),
-                    ],
-                  ),
-                  const SizedBox(
-                    width: 15,
-                  ),
-                  Row(
-                    children: [
-                      Radio(
-                        value: false,
-                        groupValue: _antibiotikLain,
-                        activeColor: const Color(0xFF20BDB7),
-                        onChanged: (index) {
-                          setState(() {
-                            _antibiotikLain = false;
-                          });
-                        },
-                      ),
-                      const Text(
-                        "Tidak",
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-              const SizedBox(
-                height: 30,
-              ),
-              const Text(
-                "Apakah ada reaksi alergi terhadap obat",
-                style: TextStyle(
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              const SizedBox(
-                height: 12,
-              ),
-              Row(
-                children: [
-                  Row(
-                    children: [
-                      Radio(
-                        value: true,
-                        groupValue: _reaksiAlergi,
-                        activeColor: const Color(0xFF20BDB7),
-                        onChanged: (index) {
-                          setState(() {
-                            _reaksiAlergi = true;
-                          });
-                        },
-                      ),
-                      const Text(
-                        "Ya",
-                      ),
-                    ],
-                  ),
-                  const SizedBox(
-                    width: 15,
-                  ),
-                  Row(
-                    children: [
-                      Radio(
-                        value: false,
-                        groupValue: _reaksiAlergi,
-                        activeColor: const Color(0xFF20BDB7),
-                        onChanged: (index) {
-                          setState(() {
-                            _reaksiAlergi = false;
-                          });
-                        },
-                      ),
-                      const Text(
-                        "Tidak",
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-              Visibility(
-                visible: _reaksiAlergi,
-                child: Column(
-                  children: [
                     const SizedBox(
                       height: 30,
                     ),
-                    TextFormField(
-                      decoration: const InputDecoration(
-                        labelText: 'Deskripsi reaksi yang muncul',
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.all(
-                            Radius.circular(15),
-                          ),
-                        ),
+                    const Text(
+                      "Apakah ada reaksi alergi terhadap obat",
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
                       ),
-                      maxLines: 4,
-                      keyboardType: TextInputType.streetAddress,
                     ),
-                  ],
-                ),
-              ),
-              const SizedBox(
-                height: 30,
-              ),
-              const Text(
-                "Apakah ada efek samping",
-                style: TextStyle(
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              const SizedBox(
-                height: 12,
-              ),
-              Row(
-                children: [
-                  Row(
-                    children: [
-                      Radio(
-                        value: true,
-                        groupValue: _efekSamping,
-                        activeColor: const Color(0xFF20BDB7),
-                        onChanged: (index) {
-                          setState(() {
-                            _efekSamping = true;
-                          });
-                        },
+                    const SizedBox(
+                      height: 12,
+                    ),
+                    Row(
+                      children: [
+                        Row(
+                          children: [
+                            Radio(
+                              value: true,
+                              groupValue: _reaksiAlergi,
+                              activeColor: const Color(0xFF20BDB7),
+                              onChanged: (index) {
+                                setState(() {
+                                  _reaksiAlergi = true;
+                                });
+                              },
+                            ),
+                            const Text(
+                              "Ya",
+                            ),
+                          ],
+                        ),
+                        const SizedBox(
+                          width: 15,
+                        ),
+                        Row(
+                          children: [
+                            Radio(
+                              value: false,
+                              groupValue: _reaksiAlergi,
+                              activeColor: const Color(0xFF20BDB7),
+                              onChanged: (index) {
+                                setState(() {
+                                  _reaksiAlergi = false;
+                                });
+                              },
+                            ),
+                            const Text(
+                              "Tidak",
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                    Visibility(
+                      visible: _reaksiAlergi,
+                      child: Column(
+                        children: [
+                          const SizedBox(
+                            height: 30,
+                          ),
+                          TextFormField(
+                            decoration: const InputDecoration(
+                              labelText: 'Deskripsi reaksi yang muncul',
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.all(
+                                  Radius.circular(15),
+                                ),
+                              ),
+                            ),
+                            maxLines: 4,
+                            keyboardType: TextInputType.streetAddress,
+                          ),
+                        ],
                       ),
-                      const Text(
-                        "Ya",
-                      ),
-                    ],
-                  ),
-                  const SizedBox(
-                    width: 15,
-                  ),
-                  Row(
-                    children: [
-                      Radio(
-                        value: false,
-                        groupValue: _efekSamping,
-                        activeColor: const Color(0xFF20BDB7),
-                        onChanged: (index) {
-                          setState(() {
-                            _efekSamping = false;
-                          });
-                        },
-                      ),
-                      const Text(
-                        "Tidak",
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-              Visibility(
-                visible: _efekSamping,
-                child: Column(
-                  children: [
+                    ),
                     const SizedBox(
                       height: 30,
                     ),
-                    TextFormField(
-                      decoration: const InputDecoration(
-                        labelText: 'Deskripsi efek samping yang muncul',
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.all(
-                            Radius.circular(15),
-                          ),
-                        ),
+                    const Text(
+                      "Apakah ada efek samping",
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
                       ),
-                      maxLines: 4,
-                      keyboardType: TextInputType.streetAddress,
+                    ),
+                    const SizedBox(
+                      height: 12,
+                    ),
+                    Row(
+                      children: [
+                        Row(
+                          children: [
+                            Radio(
+                              value: true,
+                              groupValue: _efekSamping,
+                              activeColor: const Color(0xFF20BDB7),
+                              onChanged: (index) {
+                                setState(() {
+                                  _efekSamping = true;
+                                });
+                              },
+                            ),
+                            const Text(
+                              "Ya",
+                            ),
+                          ],
+                        ),
+                        const SizedBox(
+                          width: 15,
+                        ),
+                        Row(
+                          children: [
+                            Radio(
+                              value: false,
+                              groupValue: _efekSamping,
+                              activeColor: const Color(0xFF20BDB7),
+                              onChanged: (index) {
+                                setState(() {
+                                  _efekSamping = false;
+                                });
+                              },
+                            ),
+                            const Text(
+                              "Tidak",
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                    Visibility(
+                      visible: _efekSamping,
+                      child: Column(
+                        children: [
+                          const SizedBox(
+                            height: 30,
+                          ),
+                          TextFormField(
+                            decoration: const InputDecoration(
+                              labelText: 'Deskripsi efek samping yang muncul',
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.all(
+                                  Radius.circular(15),
+                                ),
+                              ),
+                            ),
+                            maxLines: 4,
+                            keyboardType: TextInputType.streetAddress,
+                          ),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(
+                      height: 30,
                     ),
                   ],
                 ),
-              ),
-              const SizedBox(
-                height: 30,
               ),
               Row(
                 children: [
@@ -634,6 +647,13 @@ class _AddPatienAntibiotikState extends State<AddPatienAntibiotik> {
                           title: 'Apakah anda yakin ?',
                           desc: 'Tekan tombol ya untuk melanjutkan',
                           btnOkText: "Ya, lanjutkan",
+                          btnCancel: TextButton(
+                            child: const Text("cancel"),
+                            onPressed: () {
+                              Navigator.of(context).pop();
+                            },
+                          ),
+                          btnOkColor: const Color(0xFF20BDB7),
                           btnCancelOnPress: () {},
                           btnOkOnPress: () {
                             AwesomeDialog(
@@ -643,7 +663,8 @@ class _AddPatienAntibiotikState extends State<AddPatienAntibiotik> {
                               animType: AnimType.bottomSlide,
                               title: 'Pasien berhasil ditambahkan !',
                               autoHide: const Duration(seconds: 3),
-                              onDismissCallback: (e){
+                              btnOkColor: const Color(0xFF20BDB7),
+                              onDismissCallback: (e) {
                                 Navigator.push(
                                   context,
                                   MaterialPageRoute(
