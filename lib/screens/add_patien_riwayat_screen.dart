@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:multi_select_flutter/chip_display/multi_select_chip_display.dart';
 import 'package:multi_select_flutter/dialog/multi_select_dialog_field.dart';
 import 'package:multi_select_flutter/util/multi_select_item.dart';
 import 'package:project_pak_gusan/screens/add_patien_antibiotik_screen.dart';
@@ -16,8 +17,6 @@ class AddPatienRiwayat extends StatefulWidget {
 class _AddPatienRiwayatState extends State<AddPatienRiwayat> {
   TextEditingController tanggalLahir = TextEditingController();
 
-  String _selectedjenisPerawatan = "Rawat Jalan";
-
   final List<String> tempatPraktek = [
     "Praktek Pribadi",
     "Klinik",
@@ -34,9 +33,9 @@ class _AddPatienRiwayatState extends State<AddPatienRiwayat> {
     "Triage",
     "Praktek Pribadi/klinik"
   ];
-  String _selectedruangRawat = "Ruang Inap";
+  String _selectedruangRawat = "Ruang Inap",
+      _selectedBakteri = "Borrelia afzelii";
 
-  int _jenisDokter = 1;
   bool _hasilKulturBakteri = false, _namaAntibiotik = false;
 
   static List<Data> jenisPerawatan = [
@@ -53,6 +52,15 @@ class _AddPatienRiwayatState extends State<AddPatienRiwayat> {
 
   static List<Data> namaAntibiotik = [];
 
+  convertData() {
+    print("KOCAKAKA");
+    if (namaAntibiotik.isEmpty) {
+      for (var i = 0; i < dataAntibiotik.length; i++) {
+        namaAntibiotik.add(Data(id: i, name: dataAntibiotik[i]));
+      }
+    }
+  }
+
   final _itemsJenisPerawatan = jenisPerawatan
       .map((data) => MultiSelectItem<Data>(data, data.name))
       .toList();
@@ -61,20 +69,17 @@ class _AddPatienRiwayatState extends State<AddPatienRiwayat> {
       .map((data) => MultiSelectItem<Data>(data, data.name))
       .toList();
 
-  final _itemsNamaAntibiotik = namaAntibiotik
-      .map((data) => MultiSelectItem<Data>(data, data.name))
-      .toList();
-
-  convertAntibiotik() {
-    for(var i=0;i<dataAntibiotik.length;i++){
-      namaAntibiotik.add(Data(id: i, name: dataAntibiotik[i]));
-    }
-  }
+  List<MultiSelectItem> _itemsNamaAntibiotik = [];
 
   @override
   void initState() {
     super.initState();
-    convertAntibiotik();
+    convertData();
+    setState((){
+      _itemsNamaAntibiotik = namaAntibiotik
+          .map((data) => MultiSelectItem<Data>(data, data.name))
+          .toList();
+    });
   }
 
   @override
@@ -153,6 +158,16 @@ class _AddPatienRiwayatState extends State<AddPatienRiwayat> {
                     width: 1,
                   ),
                   borderRadius: BorderRadius.circular(15),
+                ),
+                chipDisplay: MultiSelectChipDisplay(
+                  items: _itemsJenisSpesimen,
+                  chipColor: const Color(0xFF20BDB7).withOpacity(0.6),
+                  textStyle: const TextStyle(
+                    color: Colors.white,
+                  ),
+                  onTap: (values) {
+
+                  },
                 ),
                 title: const Text(
                   "Jenis Perawatan",
@@ -342,6 +357,16 @@ class _AddPatienRiwayatState extends State<AddPatienRiwayat> {
                       title: const Text(
                         "Jenis Spesimen",
                       ),
+                      chipDisplay: MultiSelectChipDisplay(
+                        items: _itemsJenisSpesimen,
+                        chipColor: const Color(0xFF20BDB7).withOpacity(0.6),
+                        textStyle: const TextStyle(
+                          color: Colors.white,
+                        ),
+                        onTap: (values) {
+
+                        },
+                      ),
                       buttonIcon: const Icon(
                         Icons.arrow_drop_down,
                       ),
@@ -374,14 +399,14 @@ class _AddPatienRiwayatState extends State<AddPatienRiwayat> {
                           vertical: 5,
                         ),
                         child: DropdownButton(
-                          value: _selectedruangRawat,
-                          items: ruangRawat
+                          value: _selectedBakteri,
+                          items: dataBakteri
                               .map((code) => DropdownMenuItem(
                                   value: code, child: Text(code)))
                               .toList(),
                           onChanged: (index) {
                             setState(() {
-                              _selectedruangRawat = index.toString();
+                              _selectedBakteri = index.toString();
                             });
                           },
                           isExpanded: true,
@@ -476,6 +501,16 @@ class _AddPatienRiwayatState extends State<AddPatienRiwayat> {
                       ),
                       buttonIcon: const Icon(
                         Icons.arrow_drop_down,
+                      ),
+                      chipDisplay: MultiSelectChipDisplay(
+                        items: _itemsJenisSpesimen,
+                        chipColor: const Color(0xFF20BDB7).withOpacity(0.6),
+                        textStyle: const TextStyle(
+                          color: Colors.white,
+                        ),
+                        onTap: (values) {
+
+                        },
                       ),
                       selectedColor: const Color(0xFF20BDB7),
                       onConfirm: (index) {},
