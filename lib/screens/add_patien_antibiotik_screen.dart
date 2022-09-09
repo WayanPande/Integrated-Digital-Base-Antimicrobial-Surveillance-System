@@ -1,7 +1,8 @@
+import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:flutter/material.dart';
-import 'package:multi_select_flutter/chip_field/multi_select_chip_field.dart';
-import 'package:multi_select_flutter/dialog/multi_select_dialog_field.dart';
+import 'package:multi_select_flutter/multi_select_flutter.dart';
 import 'package:multi_select_flutter/util/multi_select_item.dart';
+import 'package:project_pak_gusan/screens/home_screen.dart';
 import 'package:project_pak_gusan/util/data_drop_down.dart';
 
 import '../util/data_class.dart';
@@ -27,36 +28,187 @@ class _AddPatienAntibiotikState extends State<AddPatienAntibiotik> {
     "Parental",
     "Topikal"
   ];
-  String _selectedJalurPemberian = "Oral", _selectedNamaAntibiotik = "Aldesulfone sodium";
+  String _selectedJalurPemberian = "Oral",
+      _selectedNamaAntibiotik = "Aldesulfone sodium";
 
-  static List<Data> namaAntibiotik = [
-    Data(id: 1, name: "Ingus"),
-    Data(id: 2, name: "Air Kencing"),
-    Data(id: 3, name: "Darah"),
-  ];
+  static List<Data> _namaAntibiotik = [];
 
-  final _itemsNamaAntibiotik = namaAntibiotik
-      .map((data) => MultiSelectItem<Data>(data, data.name))
-      .toList();
+  void addAntibiotik() {
+    var data = Antibiotik(
+        id: 1,
+        dosis: 10,
+        lamaPemberian: 10,
+        nama: _selectedNamaAntibiotik,
+        jalurPemberian: _selectedJalurPemberian);
+    var antibiotik = [..._namaAntibiotik];
+    antibiotik.add(Data(id: data.id, name: data.nama));
+
+    setState(() {
+      _namaAntibiotik = [...antibiotik];
+    });
+
+    return;
+  }
 
   Future<void> _showMyDialog() async {
-    return showDialog<void>(
+    return await showDialog<void>(
       context: context,
       barrierDismissible: false, // user must tap button!
       builder: (BuildContext context) {
-        return AlertDialog(
-          title: const Text('Tambah antibiotik'),
-          content: SingleChildScrollView(
-            child: DialogContent(),
-          ),
-          actions: <Widget>[
-            TextButton(
-              child: const Text('Tambah'),
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-            ),
-          ],
+        return StatefulBuilder(
+          builder: (context, setState) {
+            return AlertDialog(
+              title: const Text('Tambah antibiotik'),
+              content: SingleChildScrollView(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const SizedBox(
+                      height: 30,
+                    ),
+                    const Text(
+                      "Nama Antibiotik",
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    const SizedBox(
+                      height: 10,
+                    ),
+                    DecoratedBox(
+                      decoration: BoxDecoration(
+                        border: Border.all(
+                          color: Colors.black38,
+                          width: 1,
+                        ),
+                        borderRadius: BorderRadius.circular(15),
+                      ),
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 15,
+                          vertical: 5,
+                        ),
+                        child: DropdownButton(
+                          value: _selectedNamaAntibiotik,
+                          items: dataAntibiotik
+                              .map((code) => DropdownMenuItem(
+                                  value: code, child: Text(code)))
+                              .toList(),
+                          onChanged: (index) {
+                            setState(() {
+                              _selectedNamaAntibiotik = index.toString();
+                            });
+                          },
+                          isExpanded: true,
+                          underline: Container(),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(
+                      height: 30,
+                    ),
+                    const Text(
+                      "Jalur Pemberian",
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    const SizedBox(
+                      height: 10,
+                    ),
+                    DecoratedBox(
+                      decoration: BoxDecoration(
+                        border: Border.all(
+                          color: Colors.black38,
+                          width: 1,
+                        ),
+                        borderRadius: BorderRadius.circular(15),
+                      ),
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 15,
+                          vertical: 5,
+                        ),
+                        child: DropdownButton(
+                          value: _selectedJalurPemberian,
+                          items: jalurPemberian
+                              .map((code) => DropdownMenuItem(
+                                  value: code, child: Text(code)))
+                              .toList(),
+                          onChanged: (index) {
+                            setState(() {
+                              _selectedJalurPemberian = index.toString();
+                            });
+                          },
+                          isExpanded: true,
+                          underline: Container(),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(
+                      height: 30,
+                    ),
+                    TextFormField(
+                      decoration: const InputDecoration(
+                        suffixText: "mg",
+                        labelText: 'Dosis',
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.all(
+                            Radius.circular(15),
+                          ),
+                        ),
+                      ),
+                      keyboardType: TextInputType.number,
+                    ),
+                    const SizedBox(
+                      height: 30,
+                    ),
+                    TextFormField(
+                      decoration: const InputDecoration(
+                        suffixText: "Hari",
+                        labelText: 'Lama Pemberian',
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.all(
+                            Radius.circular(15),
+                          ),
+                        ),
+                      ),
+                      keyboardType: TextInputType.number,
+                    ),
+                  ],
+                ),
+              ),
+              actions: <Widget>[
+                TextButton(
+                  child: const Text('Cancel'),
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                ),
+                ElevatedButton(
+                  onPressed: () {
+                    addAntibiotik();
+                    Navigator.of(context).pop();
+                  },
+                  style: ElevatedButton.styleFrom(
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(14),
+                    ),
+                    padding: const EdgeInsets.symmetric(
+                      vertical: 15,
+                      horizontal: 15,
+                    ),
+                  ),
+                  child: const Text(
+                    "Tambah",
+                    style: TextStyle(
+                      color: Colors.white,
+                    ),
+                  ),
+                ),
+              ],
+            );
+          },
         );
       },
     );
@@ -186,6 +338,7 @@ class _AddPatienAntibiotikState extends State<AddPatienAntibiotik> {
                         onChanged: (index) {
                           setState(() {
                             _kombinasiAntibiotik = false;
+                            _namaAntibiotik = [];
                           });
                         },
                       ),
@@ -203,13 +356,33 @@ class _AddPatienAntibiotikState extends State<AddPatienAntibiotik> {
                     const SizedBox(
                       height: 15,
                     ),
-                    MultiSelectChipField(
-                      items: _itemsNamaAntibiotik,
-
+                    Visibility(
+                      visible: _namaAntibiotik.isNotEmpty,
+                      child: Column(
+                        children: const [
+                          Center(
+                            child: Text(
+                              "List antibiotik",
+                              style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ),
+                          SizedBox(
+                            height: 10,
+                          ),
+                        ],
+                      ),
+                    ),
+                    MultiSelectChipDisplay(
+                      items: _namaAntibiotik
+                          .map((data) => MultiSelectItem<Data>(data, data.name))
+                          .toList(),
                       onTap: (values) {
-
+                        setState(() {
+                          _namaAntibiotik.remove(values);
+                        });
                       },
-                      title: Text("Nama antibiotik"),
                     ),
                     const SizedBox(
                       height: 15,
@@ -226,7 +399,9 @@ class _AddPatienAntibiotikState extends State<AddPatienAntibiotik> {
                               borderRadius: BorderRadius.circular(14),
                             ),
                             padding: const EdgeInsets.symmetric(
-                                vertical: 15, horizontal: 15),
+                              vertical: 15,
+                              horizontal: 15,
+                            ),
                           ),
                           child: const Text(
                             "Tambah antibiotik",
@@ -451,14 +626,46 @@ class _AddPatienAntibiotikState extends State<AddPatienAntibiotik> {
                   Expanded(
                     child: ElevatedButton(
                       onPressed: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) {
-                              return const AddPatienAntibiotik();
-                            },
-                          ),
-                        );
+                        AwesomeDialog(
+                          context: context,
+                          dialogType: DialogType.warning,
+                          dismissOnTouchOutside: false,
+                          animType: AnimType.bottomSlide,
+                          title: 'Apakah anda yakin ?',
+                          desc: 'Tekan tombol ya untuk melanjutkan',
+                          btnOkText: "Ya, lanjutkan",
+                          btnCancelOnPress: () {},
+                          btnOkOnPress: () {
+                            AwesomeDialog(
+                              context: context,
+                              dialogType: DialogType.success,
+                              dismissOnTouchOutside: false,
+                              animType: AnimType.bottomSlide,
+                              title: 'Pasien berhasil ditambahkan !',
+                              autoHide: const Duration(seconds: 3),
+                              onDismissCallback: (e){
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) {
+                                      return const HomeScreen();
+                                    },
+                                  ),
+                                );
+                              },
+                              btnOkOnPress: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) {
+                                      return const HomeScreen();
+                                    },
+                                  ),
+                                );
+                              },
+                            ).show();
+                          },
+                        ).show();
                       },
                       style: ElevatedButton.styleFrom(
                         shape: RoundedRectangleBorder(
@@ -484,145 +691,3 @@ class _AddPatienAntibiotikState extends State<AddPatienAntibiotik> {
     );
   }
 }
-
-
-class DialogContent extends StatefulWidget {
-  const DialogContent({Key? key}) : super(key: key);
-
-  @override
-  State<DialogContent> createState() => _DialogContentState();
-}
-
-class _DialogContentState extends State<DialogContent> {
-
-  String _selectedJalurPemberian = "Oral", _selectedNamaAntibiotik = "Aldesulfone sodium";
-  final List<String> jalurPemberian = [
-    "Oral",
-    "IV",
-    "IM",
-    "Parental",
-    "Topikal"
-  ];
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        const SizedBox(
-          height: 30,
-        ),
-        const Text(
-          "Nama Antibiotik",
-          style: TextStyle(
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-        const SizedBox(
-          height: 10,
-        ),
-        DecoratedBox(
-          decoration: BoxDecoration(
-            border: Border.all(
-              color: Colors.black38,
-              width: 1,
-            ),
-            borderRadius: BorderRadius.circular(15),
-          ),
-          child: Padding(
-            padding: const EdgeInsets.symmetric(
-              horizontal: 15,
-              vertical: 5,
-            ),
-            child: DropdownButton(
-              value: _selectedNamaAntibiotik,
-              items: dataAntibiotik
-                  .map((code) =>
-                  DropdownMenuItem(value: code, child: Text(code)))
-                  .toList(),
-              onChanged: (index) {
-                setState(() {
-                  _selectedNamaAntibiotik = index.toString();
-                });
-              },
-              isExpanded: true,
-              underline: Container(),
-            ),
-          ),
-        ),
-        const SizedBox(
-          height: 30,
-        ),
-        const Text(
-          "Jalur Pemberian",
-          style: TextStyle(
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-        const SizedBox(
-          height: 10,
-        ),
-        DecoratedBox(
-          decoration: BoxDecoration(
-            border: Border.all(
-              color: Colors.black38,
-              width: 1,
-            ),
-            borderRadius: BorderRadius.circular(15),
-          ),
-          child: Padding(
-            padding: const EdgeInsets.symmetric(
-              horizontal: 15,
-              vertical: 5,
-            ),
-            child: DropdownButton(
-              value: _selectedJalurPemberian,
-              items: jalurPemberian
-                  .map((code) =>
-                  DropdownMenuItem(value: code, child: Text(code)))
-                  .toList(),
-              onChanged: (index) {
-                setState(() {
-                  _selectedJalurPemberian = index.toString();
-                });
-              },
-              isExpanded: true,
-              underline: Container(),
-            ),
-          ),
-        ),
-        const SizedBox(
-          height: 30,
-        ),
-        TextFormField(
-          decoration: const InputDecoration(
-            suffixText: "mg",
-            labelText: 'Dosis',
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.all(
-                Radius.circular(15),
-              ),
-            ),
-          ),
-          keyboardType: TextInputType.number,
-        ),
-        const SizedBox(
-          height: 30,
-        ),
-        TextFormField(
-          decoration: const InputDecoration(
-            suffixText: "Hari",
-            labelText: 'Lama Pemberian',
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.all(
-                Radius.circular(15),
-              ),
-            ),
-          ),
-          keyboardType: TextInputType.number,
-        ),
-      ],
-    );
-  }
-}
-
