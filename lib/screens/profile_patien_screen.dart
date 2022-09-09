@@ -8,7 +8,9 @@ import 'package:project_pak_gusan/widget/riwayat_pasien_list.dart';
 import '../widget/antibiotik_card.dart';
 
 class ProfilePatienScreen extends StatefulWidget {
-  const ProfilePatienScreen({Key? key}) : super(key: key);
+  const ProfilePatienScreen({Key? key, required this.name, required this.umur}) : super(key: key);
+
+  final String name, umur;
 
   @override
   State<ProfilePatienScreen> createState() => _ProfilePatienScreenState();
@@ -61,9 +63,9 @@ class _ProfilePatienScreenState extends State<ProfilePatienScreen> {
                     width: 70,
                     height: 70,
                     decoration: BoxDecoration(
-                      image: const DecorationImage(
+                      image: DecorationImage(
                         image: NetworkImage(
-                          "https://avatars.dicebear.com/api/adventurer-neutral/joko.jpg",
+                          "https://avatars.dicebear.com/api/adventurer-neutral/${widget.name}.jpg",
                         ),
                       ),
                       borderRadius: BorderRadius.circular(15),
@@ -73,8 +75,8 @@ class _ProfilePatienScreenState extends State<ProfilePatienScreen> {
                     width: 20,
                   ),
                   Text(
-                    "John Johnsons",
-                    style: TextStyle(
+                    widget.name,
+                    style: const TextStyle(
                       fontWeight: FontWeight.bold,
                       fontSize: 20,
                     ),
@@ -90,12 +92,12 @@ class _ProfilePatienScreenState extends State<ProfilePatienScreen> {
                 children: [
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
-                    children: const [
+                    children: [
                       PatienData(
                         title: "Umur",
-                        content: "24 tahun",
+                        content: "${widget.umur} tahun",
                       ),
-                      SizedBox(
+                      const SizedBox(
                         height: 20,
                       ),
                       PatienData(
