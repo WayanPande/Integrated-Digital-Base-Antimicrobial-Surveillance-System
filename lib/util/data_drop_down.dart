@@ -267,8 +267,6 @@ List<String> dataBakteri = [
   "Mycoplasma pneumonia",
   "Neisseria gonorrhoeae",
   "Neisseria meningitidis",
-  "Neisseria gonorrhoeae",
-  "Neisseria meningitidis",
   "Pasteurella multocida",
   "Peptostreptococcus anaerobius",
   "Porphyromonas gingivalis",

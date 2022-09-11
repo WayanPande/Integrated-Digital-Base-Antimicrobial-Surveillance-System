@@ -4,7 +4,10 @@ import 'package:multi_select_flutter/multi_select_flutter.dart';
 import 'package:multi_select_flutter/util/multi_select_item.dart';
 import 'package:project_pak_gusan/screens/home_screen.dart';
 import 'package:project_pak_gusan/util/data_drop_down.dart';
+import 'package:provider/provider.dart';
 
+import '../providers/antibiotik.dart';
+import '../providers/patients.dart';
 import '../util/data_class.dart';
 
 class AddPatienAntibiotik extends StatefulWidget {
@@ -20,6 +23,9 @@ class _AddPatienAntibiotikState extends State<AddPatienAntibiotik> {
       _antibiotikLain = false,
       _reaksiAlergi = false,
       _efekSamping = false;
+
+  TextEditingController deskripsiReaksi = TextEditingController();
+  TextEditingController deskripsiEfekSamping = TextEditingController();
 
   final List<String> jalurPemberian = [
     "Oral",
@@ -55,6 +61,13 @@ class _AddPatienAntibiotikState extends State<AddPatienAntibiotik> {
       context: context,
       barrierDismissible: false, // user must tap button!
       builder: (BuildContext context) {
+        final antibiotics = Provider.of<Antibiotics>(context, listen: false);
+
+        var data = PemberianAntibiotik();
+        data.jalurPemberian = _selectedJalurPemberian;
+        data.id_antibiotik =
+            dataAntibiotik.indexOf(_selectedNamaAntibiotik.toString()) + 1;
+
         return StatefulBuilder(
           builder: (context, setState) {
             return AlertDialog(
@@ -95,6 +108,9 @@ class _AddPatienAntibiotikState extends State<AddPatienAntibiotik> {
                                   value: code, child: Text(code)))
                               .toList(),
                           onChanged: (index) {
+                            data.id_antibiotik = dataAntibiotik
+                                    .indexOf(index.toString().toString()) +
+                                1;
                             setState(() {
                               _selectedNamaAntibiotik = index.toString();
                             });
@@ -136,6 +152,7 @@ class _AddPatienAntibiotikState extends State<AddPatienAntibiotik> {
                                   value: code, child: Text(code)))
                               .toList(),
                           onChanged: (index) {
+                            data.jalurPemberian = index.toString();
                             setState(() {
                               _selectedJalurPemberian = index.toString();
                             });
@@ -159,22 +176,27 @@ class _AddPatienAntibiotikState extends State<AddPatienAntibiotik> {
                         ),
                       ),
                       keyboardType: TextInputType.number,
+                      onChanged: (value) {
+                        data.dosis = int.parse(value);
+                      },
                     ),
                     const SizedBox(
                       height: 30,
                     ),
                     TextFormField(
-                      decoration: const InputDecoration(
-                        suffixText: "Hari",
-                        labelText: 'Lama Pemberian',
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.all(
-                            Radius.circular(15),
+                        decoration: const InputDecoration(
+                          suffixText: "Hari",
+                          labelText: 'Lama Pemberian',
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.all(
+                              Radius.circular(15),
+                            ),
                           ),
                         ),
-                      ),
-                      keyboardType: TextInputType.number,
-                    ),
+                        keyboardType: TextInputType.number,
+                        onChanged: (value) {
+                          data.lamaPemberian = int.parse(value);
+                        }),
                   ],
                 ),
               ),
@@ -188,6 +210,7 @@ class _AddPatienAntibiotikState extends State<AddPatienAntibiotik> {
                 ElevatedButton(
                   onPressed: () {
                     addAntibiotik();
+                    antibiotics.addAntibiotik(data);
                     Navigator.of(context).pop();
                   },
                   style: ElevatedButton.styleFrom(
@@ -216,6 +239,20 @@ class _AddPatienAntibiotikState extends State<AddPatienAntibiotik> {
 
   @override
   Widget build(BuildContext context) {
+    final pasien = Provider.of<Patiens>(context, listen: false);
+    final antibiotics = Provider.of<Antibiotics>(context);
+
+    pasien.kombinasiAntibiotik = _diberikanAntibiotik;
+    pasien.pemberianAntibiotik = antibiotics.items;
+
+    deskripsiReaksi.addListener(() {
+      pasien.reaksiObat = deskripsiReaksi.text;
+    });
+
+    deskripsiEfekSamping.addListener(() {
+      pasien.efekSamping = deskripsiEfekSamping.text;
+    });
+
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
@@ -355,6 +392,7 @@ class _AddPatienAntibiotikState extends State<AddPatienAntibiotik> {
                                 setState(() {
                                   _kombinasiAntibiotik = false;
                                   _namaAntibiotik = [];
+                                  antibiotics.items = [];
                                 });
                               },
                             ),
@@ -550,6 +588,7 @@ class _AddPatienAntibiotikState extends State<AddPatienAntibiotik> {
                             height: 30,
                           ),
                           TextFormField(
+                            controller: deskripsiReaksi,
                             decoration: const InputDecoration(
                               labelText: 'Deskripsi reaksi yang muncul',
                               border: OutlineInputBorder(
@@ -625,6 +664,7 @@ class _AddPatienAntibiotikState extends State<AddPatienAntibiotik> {
                             height: 30,
                           ),
                           TextFormField(
+                            controller: deskripsiEfekSamping,
                             decoration: const InputDecoration(
                               labelText: 'Deskripsi efek samping yang muncul',
                               border: OutlineInputBorder(
@@ -667,6 +707,8 @@ class _AddPatienAntibiotikState extends State<AddPatienAntibiotik> {
                           btnOkColor: const Color(0xFF20BDB7),
                           btnCancelOnPress: () {},
                           btnOkOnPress: () {
+                            pasien.addPatien();
+
                             AwesomeDialog(
                               context: context,
                               dialogType: DialogType.success,

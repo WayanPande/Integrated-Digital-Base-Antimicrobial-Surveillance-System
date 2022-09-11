@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:project_pak_gusan/providers/patients.dart';
 import 'package:project_pak_gusan/screens/add_patien_riwayat_screen.dart';
+import 'package:provider/provider.dart';
 
 class AddPatienIdentitas extends StatefulWidget {
   const AddPatienIdentitas({Key? key}) : super(key: key);
@@ -11,6 +13,10 @@ class AddPatienIdentitas extends StatefulWidget {
 
 class _AddPatienIdentitasState extends State<AddPatienIdentitas> {
   TextEditingController tanggalLahir = TextEditingController();
+  TextEditingController nama = TextEditingController();
+  TextEditingController noHp = TextEditingController();
+  TextEditingController alamat = TextEditingController();
+  TextEditingController komorbid = TextEditingController();
 
   final List<String> jenisKelamin = ["Laki - Laki", "Wanita"];
 
@@ -18,6 +24,30 @@ class _AddPatienIdentitasState extends State<AddPatienIdentitas> {
 
   @override
   Widget build(BuildContext context) {
+    final pasien = Provider.of<Patiens>(context, listen: false);
+
+    nama.addListener(() {
+      pasien.name = nama.text;
+    });
+
+    tanggalLahir.addListener(() {
+      pasien.tanggalLahir = tanggalLahir.text;
+    });
+
+    noHp.addListener(() {
+      pasien.noHp = noHp.text;
+    });
+
+    alamat.addListener(() {
+      pasien.alamat = alamat.text;
+    });
+
+    komorbid.addListener(() {
+      pasien.komorbid = komorbid.text;
+    });
+
+    pasien.gender = _selectedJenisKelamin;
+
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
@@ -50,12 +80,16 @@ class _AddPatienIdentitasState extends State<AddPatienIdentitas> {
               ),
               const Text(
                 "Identitas Pasien",
-                style: TextStyle(fontWeight: FontWeight.w900, fontSize: 16,),
+                style: TextStyle(
+                  fontWeight: FontWeight.w900,
+                  fontSize: 16,
+                ),
               ),
               const SizedBox(
                 height: 30,
               ),
               TextFormField(
+                controller: nama,
                 decoration: const InputDecoration(
                   labelText: 'Nama',
                   border: OutlineInputBorder(
@@ -106,6 +140,7 @@ class _AddPatienIdentitasState extends State<AddPatienIdentitas> {
                 height: 30,
               ),
               TextFormField(
+                controller: noHp,
                 decoration: const InputDecoration(
                   labelText: 'No Handphone',
                   border: OutlineInputBorder(
@@ -151,6 +186,7 @@ class _AddPatienIdentitasState extends State<AddPatienIdentitas> {
                       setState(() {
                         _selectedJenisKelamin = index.toString();
                       });
+                      pasien.gender = index.toString();
                     },
                     isExpanded: true,
                     underline: Container(),
@@ -161,6 +197,7 @@ class _AddPatienIdentitasState extends State<AddPatienIdentitas> {
                 height: 30,
               ),
               TextFormField(
+                controller: alamat,
                 decoration: const InputDecoration(
                   labelText: 'Alamat',
                   border: OutlineInputBorder(
@@ -175,6 +212,7 @@ class _AddPatienIdentitasState extends State<AddPatienIdentitas> {
                 height: 30,
               ),
               TextFormField(
+                controller: komorbid,
                 decoration: const InputDecoration(
                   labelText: 'Ada Komorbid ?',
                   border: OutlineInputBorder(

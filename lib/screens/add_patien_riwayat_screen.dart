@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:logger/logger.dart';
 import 'package:multi_select_flutter/chip_display/multi_select_chip_display.dart';
 import 'package:multi_select_flutter/dialog/multi_select_dialog_field.dart';
 import 'package:multi_select_flutter/util/multi_select_item.dart';
 import 'package:project_pak_gusan/screens/add_patien_antibiotik_screen.dart';
 import 'package:project_pak_gusan/util/data_drop_down.dart';
+import 'package:provider/provider.dart';
 
+import '../providers/patients.dart';
 import '../util/data_class.dart';
 
 class AddPatienRiwayat extends StatefulWidget {
@@ -16,6 +19,9 @@ class AddPatienRiwayat extends StatefulWidget {
 
 class _AddPatienRiwayatState extends State<AddPatienRiwayat> {
   TextEditingController tanggalLahir = TextEditingController();
+  TextEditingController dxSementara = TextEditingController();
+  TextEditingController dxDefinitif = TextEditingController();
+  TextEditingController lamaDirawat = TextEditingController();
 
   final List<String> tempatPraktek = [
     "Praktek Pribadi",
@@ -24,7 +30,8 @@ class _AddPatienRiwayatState extends State<AddPatienRiwayat> {
     "Poliklinik",
     "Rumah Sakit"
   ];
-  String _selectedtempatPraktek = "Praktek Pribadi";
+  String _selectedtempatPraktek = "Praktek Pribadi",
+      _selectedJenisPerawatan = "Rawat Jalan";
 
   final List<String> ruangRawat = [
     "Ruang Inap",
@@ -38,10 +45,10 @@ class _AddPatienRiwayatState extends State<AddPatienRiwayat> {
 
   bool _hasilKulturBakteri = false, _namaAntibiotik = false;
 
-  static List<Data> jenisPerawatan = [
-    Data(id: 1, name: "Rawat Jalan"),
-    Data(id: 2, name: "Rawat Inap/Opname"),
-    Data(id: 3, name: "Meninggal"),
+  final List<String> jenisPerawatan = [
+    "Rawat Jalan",
+    "Rawat Inap/Opname",
+    "Meninggal",
   ];
 
   static List<Data> jenisSpesimen = [
@@ -60,10 +67,6 @@ class _AddPatienRiwayatState extends State<AddPatienRiwayat> {
     }
   }
 
-  final _itemsJenisPerawatan = jenisPerawatan
-      .map((data) => MultiSelectItem<Data>(data, data.name))
-      .toList();
-
   final _itemsJenisSpesimen = jenisSpesimen
       .map((data) => MultiSelectItem<Data>(data, data.name))
       .toList();
@@ -74,7 +77,7 @@ class _AddPatienRiwayatState extends State<AddPatienRiwayat> {
   void initState() {
     super.initState();
     convertData();
-    setState((){
+    setState(() {
       _itemsNamaAntibiotik = namaAntibiotik
           .map((data) => MultiSelectItem<Data>(data, data.name))
           .toList();
@@ -83,6 +86,29 @@ class _AddPatienRiwayatState extends State<AddPatienRiwayat> {
 
   @override
   Widget build(BuildContext context) {
+    final pasien = Provider.of<Patiens>(context, listen: false);
+
+    tanggalLahir.addListener(() {
+      pasien.tanggalLahir = tanggalLahir.text;
+    });
+
+    dxSementara.addListener(() {
+      pasien.dxSementara = dxSementara.text;
+    });
+
+    dxDefinitif.addListener(() {
+      pasien.dxDefinitif = dxDefinitif.text;
+    });
+
+    lamaDirawat.addListener(() {
+      pasien.lamaDirawat = int.parse(lamaDirawat.text);
+    });
+
+    pasien.jenisPerawatan = _selectedJenisPerawatan;
+    pasien.tempatPraktek = _selectedtempatPraktek;
+    pasien.ruangRawat = _selectedruangRawat;
+    pasien.hasilBakteri = _selectedBakteri;
+
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
@@ -124,6 +150,7 @@ class _AddPatienRiwayatState extends State<AddPatienRiwayat> {
                 height: 30,
               ),
               TextFormField(
+                controller: dxSementara,
                 decoration: const InputDecoration(
                   labelText: 'Dx Sementara',
                   border: OutlineInputBorder(
@@ -138,6 +165,7 @@ class _AddPatienRiwayatState extends State<AddPatienRiwayat> {
                 height: 30,
               ),
               TextFormField(
+                controller: dxDefinitif,
                 decoration: const InputDecoration(
                   labelText: 'Dx Definitif',
                   border: OutlineInputBorder(
@@ -146,7 +174,7 @@ class _AddPatienRiwayatState extends State<AddPatienRiwayat> {
                     ),
                   ),
                 ),
-                keyboardType: TextInputType.phone,
+                keyboardType: TextInputType.text,
               ),
               const SizedBox(
                 height: 30,
@@ -160,8 +188,7 @@ class _AddPatienRiwayatState extends State<AddPatienRiwayat> {
               const SizedBox(
                 height: 10,
               ),
-              MultiSelectDialogField(
-                items: _itemsJenisPerawatan,
+              DecoratedBox(
                 decoration: BoxDecoration(
                   border: Border.all(
                     color: Colors.black38,
@@ -169,29 +196,33 @@ class _AddPatienRiwayatState extends State<AddPatienRiwayat> {
                   ),
                   borderRadius: BorderRadius.circular(15),
                 ),
-                chipDisplay: MultiSelectChipDisplay(
-                  items: _itemsJenisSpesimen,
-                  chipColor: const Color(0xFF20BDB7).withOpacity(0.6),
-                  textStyle: const TextStyle(
-                    color: Colors.white,
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 15,
+                    vertical: 5,
                   ),
-                  onTap: (values) {
-
-                  },
+                  child: DropdownButton(
+                    value: _selectedJenisPerawatan,
+                    items: jenisPerawatan
+                        .map((code) =>
+                            DropdownMenuItem(value: code, child: Text(code)))
+                        .toList(),
+                    onChanged: (index) {
+                      pasien.jenisPerawatan = index.toString();
+                      setState(() {
+                        _selectedJenisPerawatan = index.toString();
+                      });
+                    },
+                    isExpanded: true,
+                    underline: Container(),
+                  ),
                 ),
-                title: const Text(
-                  "Jenis Perawatan",
-                ),
-                buttonIcon: const Icon(
-                  Icons.arrow_drop_down,
-                ),
-                selectedColor: const Color(0xFF20BDB7),
-                onConfirm: (index) {},
               ),
               const SizedBox(
                 height: 30,
               ),
               TextFormField(
+                controller: lamaDirawat,
                 decoration: const InputDecoration(
                   suffixText: "Hari",
                   labelText: 'Lama Dirawat',
@@ -235,6 +266,7 @@ class _AddPatienRiwayatState extends State<AddPatienRiwayat> {
                             DropdownMenuItem(value: code, child: Text(code)))
                         .toList(),
                     onChanged: (index) {
+                      pasien.tempatPraktek = index.toString();
                       setState(() {
                         _selectedtempatPraktek = index.toString();
                       });
@@ -276,6 +308,7 @@ class _AddPatienRiwayatState extends State<AddPatienRiwayat> {
                             DropdownMenuItem(value: code, child: Text(code)))
                         .toList(),
                     onChanged: (index) {
+                      pasien.ruangRawat = index.toString();
                       setState(() {
                         _selectedruangRawat = index.toString();
                       });
@@ -373,15 +406,15 @@ class _AddPatienRiwayatState extends State<AddPatienRiwayat> {
                         textStyle: const TextStyle(
                           color: Colors.white,
                         ),
-                        onTap: (values) {
-
-                        },
+                        onTap: (values) {},
                       ),
                       buttonIcon: const Icon(
                         Icons.arrow_drop_down,
                       ),
                       selectedColor: const Color(0xFF20BDB7),
-                      onConfirm: (index) {},
+                      onConfirm: (List<Data> index) {
+                        pasien.spesimenName = index[0].name;
+                      },
                     ),
                     const SizedBox(
                       height: 30,
@@ -415,6 +448,7 @@ class _AddPatienRiwayatState extends State<AddPatienRiwayat> {
                                   value: code, child: Text(code)))
                               .toList(),
                           onChanged: (index) {
+                            pasien.hasilBakteri = index.toString();
                             setState(() {
                               _selectedBakteri = index.toString();
                             });
@@ -518,12 +552,15 @@ class _AddPatienRiwayatState extends State<AddPatienRiwayat> {
                         textStyle: const TextStyle(
                           color: Colors.white,
                         ),
-                        onTap: (values) {
-
-                        },
+                        onTap: (values) {},
                       ),
                       selectedColor: const Color(0xFF20BDB7),
-                      onConfirm: (index) {},
+                      onConfirm: (List index) {
+                        pasien.antibiotikSensitif = index
+                            .map((e) =>
+                                AntibiotikSensitif(id_antibiotik: (e.id + 1)))
+                            .toList();
+                      },
                       searchable: true,
                     ),
                   ],
