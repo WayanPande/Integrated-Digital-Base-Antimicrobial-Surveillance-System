@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:project_pak_gusan/providers/antibiotik.dart';
+import 'package:project_pak_gusan/providers/doctors.dart';
 import 'package:project_pak_gusan/providers/patients.dart';
 import 'package:project_pak_gusan/screens/login_screen.dart';
 import 'package:provider/provider.dart';
@@ -52,6 +53,9 @@ class MyApp extends StatelessWidget {
         ),
         ChangeNotifierProvider(
           create: (ctx) => Antibiotics(),
+        ),
+        ChangeNotifierProvider(
+          create: (ctx) => Doctors(),
         ),
       ],
       child: MaterialApp(

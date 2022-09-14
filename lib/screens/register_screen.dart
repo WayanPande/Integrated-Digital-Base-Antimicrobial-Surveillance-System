@@ -1,5 +1,8 @@
+import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:flutter/material.dart';
+import 'package:project_pak_gusan/providers/doctors.dart';
 import 'package:project_pak_gusan/screens/login_screen.dart';
+import 'package:provider/provider.dart';
 
 import '../util/data_drop_down.dart';
 import '../widget/authentication_header.dart';
@@ -18,14 +21,75 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
   final _formKey = GlobalKey<FormState>();
 
+  TextEditingController nama = TextEditingController();
+  TextEditingController email = TextEditingController();
+  TextEditingController password = TextEditingController();
+  TextEditingController lokasiPraktek = TextEditingController();
+
   String _selectedJenisSpesialis = "Spesialis Akupunktur Medik",
       _selectedKlinik = "Klinik Asih Usadha",
       _selectedRumahSakit = "RS Bali Royal",
       _selectedPuskesmas = "Puskesmas I Denpasar Utara",
       _selectedPoliklinik = "Klinik Utama Dharma Sidhi";
 
+
+  showLoaderDialog(BuildContext context) {
+    AlertDialog alert = AlertDialog(
+      backgroundColor: Colors.transparent,
+      elevation: 0,
+      content: Wrap(
+        children: [
+          Center(
+            child: Container(
+              decoration: const BoxDecoration(
+                shape: BoxShape.circle,
+                color: Colors.white,
+              ),
+              padding: const EdgeInsets.all(15),
+              child: const CircularProgressIndicator(),
+            ),
+          ),
+        ],
+      ),
+    );
+    showDialog(
+      barrierDismissible: false,
+      context: context,
+      builder: (BuildContext context) {
+        return alert;
+      },
+    );
+  }
+
+
   @override
   Widget build(BuildContext context) {
+
+    var doctor = Provider.of<Doctors>(context);
+
+    doctor.newDoktor.jenisSpesialisId = dataSpesialis.indexOf(_selectedJenisSpesialis) + 1;
+    doctor.newDoktor.klinikId = dataKlinik.indexOf(_selectedPoliklinik) + 1;
+    doctor.newDoktor.rumahSakitId = dataRumahSakit.indexOf(_selectedRumahSakit) + 1;
+    doctor.newDoktor.puskesmasId = dataPuskesmas.indexOf(_selectedPuskesmas) + 1;
+    doctor.newDoktor.poliklinikId = dataKlinik.indexOf(_selectedPoliklinik) + 1;
+    doctor.newDoktor.jenisDokter = _jenisDokter == 1 ? "Spesialis" : "Umum";
+
+    nama.addListener(() {
+      doctor.newDoktor.nama = nama.text;
+    });
+
+    email.addListener(() {
+      doctor.newDoktor.email = email.text;
+    });
+
+    password.addListener(() {
+      doctor.newDoktor.password = password.text;
+    });
+
+    lokasiPraktek.addListener(() {
+      doctor.newDoktor.lokasiPraktek = lokasiPraktek.text;
+    });
+
     return Scaffold(
       body: SingleChildScrollView(
         child: Column(
@@ -42,6 +106,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     TextFormField(
+                      controller: nama,
                       validator: (value){
                         if(value != null) {
                           if(value.isEmpty) {
@@ -64,6 +129,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       height: heightSpacing,
                     ),
                     TextFormField(
+                      controller: email,
                       validator: (value){
                         if(value != null) {
                           if(value.isEmpty) {
@@ -90,6 +156,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       height: heightSpacing,
                     ),
                     TextFormField(
+                      controller: password,
                       validator: (value){
                         if(value != null) {
                           if(value.isEmpty) {
@@ -219,6 +286,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       height: heightSpacing,
                     ),
                     TextFormField(
+                      controller: lokasiPraktek,
                       validator: (value){
                         if(value != null) {
                           if(value.isEmpty) {
@@ -412,14 +480,55 @@ class _RegisterScreenState extends State<RegisterScreen> {
                           child: ElevatedButton(
                             onPressed: () {
                               if(_formKey.currentState!.validate()){
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) {
-                                      return const LoginScreen();
+
+                                AwesomeDialog(
+                                  context: context,
+                                  dialogType: DialogType.warning,
+                                  dismissOnTouchOutside: false,
+                                  animType: AnimType.bottomSlide,
+                                  title: 'Apakah anda yakin ?',
+                                  desc: 'Tekan tombol ya untuk melanjutkan',
+                                  btnOkText: "Ya, lanjutkan",
+                                  btnCancel: TextButton(
+                                    child: const Text("cancel"),
+                                    onPressed: () {
+                                      Navigator.of(context).pop();
                                     },
                                   ),
-                                );
+                                  btnOkColor: const Color(0xFF20BDB7),
+                                  btnCancelOnPress: () {},
+                                  btnOkOnPress: () {
+                                    showLoaderDialog(context);
+                                    doctor.addDokter().then(
+                                          (_) {
+                                        Navigator.of(context).pop();
+                                        AwesomeDialog(
+                                          context: context,
+                                          dialogType: DialogType.success,
+                                          dismissOnTouchOutside: false,
+                                          animType: AnimType.bottomSlide,
+                                          title: 'Akun berhasil dibuat !',
+                                          autoHide: const Duration(seconds: 3),
+                                          btnOkColor: const Color(0xFF20BDB7),
+                                          onDismissCallback: (e) {
+                                            Navigator.of(context).pushAndRemoveUntil(MaterialPageRoute(builder: (context) =>
+                                            const LoginScreen()), (Route<dynamic> route) => false);
+                                          },
+                                          btnOkOnPress: () {
+                                            Navigator.push(
+                                              context,
+                                              MaterialPageRoute(
+                                                builder: (context) {
+                                                  return const LoginScreen();
+                                                },
+                                              ),
+                                            );
+                                          },
+                                        ).show();
+                                      },
+                                    );
+                                  },
+                                ).show();
                               }
                             },
                             style: ElevatedButton.styleFrom(

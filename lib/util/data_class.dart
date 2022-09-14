@@ -21,6 +21,60 @@ class Antibiotik {
   });
 }
 
+class Doktor {
+  String? nama;
+  String? email;
+  String? password;
+  String? jenisDokter;
+  int? jenisSpesialisId;
+  String? lokasiPraktek;
+  int? klinikId;
+  int? rumahSakitId;
+  int? poliklinikId;
+  int? puskesmasId;
+
+  Doktor(
+      {this.nama,
+        this.email,
+        this.password,
+        this.jenisDokter,
+        this.jenisSpesialisId,
+        this.lokasiPraktek,
+        this.klinikId,
+        this.rumahSakitId,
+        this.poliklinikId,
+        this.puskesmasId});
+
+  Doktor.fromJson(Map<String, dynamic> json) {
+    nama = json['nama'];
+    email = json['email'];
+    password = json['password'];
+    jenisDokter = json['jenis_dokter'];
+    jenisSpesialisId = json['jenis_spesialis_id'];
+    lokasiPraktek = json['lokasi_praktek'];
+    klinikId = json['klinik_id'];
+    rumahSakitId = json['rumah_sakit_id'];
+    poliklinikId = json['poliklinik_id'];
+    puskesmasId = json['puskesmas_id'];
+  }
+
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = new Map<String, dynamic>();
+    data['nama'] = this.nama;
+    data['email'] = this.email;
+    data['password'] = this.password;
+    data['jenis_dokter'] = this.jenisDokter;
+    data['jenis_spesialis_id'] = this.jenisSpesialisId;
+    data['lokasi_praktek'] = this.lokasiPraktek;
+    data['klinik_id'] = this.klinikId;
+    data['rumah_sakit_id'] = this.rumahSakitId;
+    data['poliklinik_id'] = this.poliklinikId;
+    data['puskesmas_id'] = this.puskesmasId;
+    return data;
+  }
+}
+
+
 class PasienList {
   String name;
   String tanggal_lahir;

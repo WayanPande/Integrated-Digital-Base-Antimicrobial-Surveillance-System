@@ -46,6 +46,34 @@ class _AddPatienIdentitasState extends State<AddPatienIdentitas> {
     super.initState();
   }
 
+  showLoaderDialog(BuildContext context) {
+    AlertDialog alert = AlertDialog(
+      backgroundColor: Colors.transparent,
+      elevation: 0,
+      content: Wrap(
+        children: [
+          Center(
+            child: Container(
+              decoration: const BoxDecoration(
+                shape: BoxShape.circle,
+                color: Colors.white,
+              ),
+              padding: const EdgeInsets.all(15),
+              child: const CircularProgressIndicator(),
+            ),
+          ),
+        ],
+      ),
+    );
+    showDialog(
+      barrierDismissible: false,
+      context: context,
+      builder: (BuildContext context) {
+        return alert;
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final pasien = Provider.of<Patiens>(context, listen: false);
@@ -330,6 +358,7 @@ class _AddPatienIdentitasState extends State<AddPatienIdentitas> {
                               btnOkColor: const Color(0xFF20BDB7),
                               btnCancelOnPress: () {},
                               btnOkOnPress: () {
+                                showLoaderDialog(context);
                                 pasien.updatePasien().then(
                                       (_) {
                                     AwesomeDialog(
