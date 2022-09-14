@@ -1,9 +1,7 @@
-import 'dart:convert';
-
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
 import 'package:logger/logger.dart';
 
+import '../service/http_service.dart';
 import '../util/data_class.dart';
 
 class Patiens with ChangeNotifier {
@@ -12,6 +10,20 @@ class Patiens with ChangeNotifier {
   Map<String, Pasien> get items {
     return {..._items};
   }
+
+  List<PasienList> _pasienList = [];
+
+  List<PasienList> get pasienList {
+    return [..._pasienList];
+  }
+
+  Map<String, dynamic> _pasienDetail = {};
+
+  Map<String, dynamic> get pasienDetail {
+    return {..._pasienDetail};
+  }
+
+  bool isEditing = false;
 
   String? name = null,
       tanggalLahir = null,
@@ -35,7 +47,10 @@ class Patiens with ChangeNotifier {
 
   List<AntibiotikSensitif> antibiotikSensitif = [];
 
-  List<PemberianAntibiotik> pemberianAntibiotik = [];
+  List<PemberianAntibiotik> pemberianAntibiotik = [],
+      pemberianAntibiotikDetail = [];
+
+  List<Data> riwayatAntibiotik = [];
 
   Future<void> addPatien() async {
     if (_items.containsKey(name)) {
@@ -95,9 +110,11 @@ class Patiens with ChangeNotifier {
             ruang_rawat: ruangRawat,
             hasil_bakteri: hasilBakteri,
           ),
-          spesimen: Spesimen(
-            name: spesimenName,
-          ),
+          spesimen: spesimenName != null
+              ? Spesimen(
+                  name: spesimenName,
+                )
+              : null,
           antibiotik_sensitif: antibiotikSensitif,
           riwayat_antibiotik: RiwayatAntibiotik(
             kombinasi_antibiotik: kombinasiAntibiotik,
@@ -109,30 +126,75 @@ class Patiens with ChangeNotifier {
       );
     }
 
-    const String pasienkURL = "http://10.0.2.2:3000/pasien";
-
-    var logger = Logger();
-
-    logger.d(jsonEncode(items[name]?.visitasi?.jenis_perawatan));
-
-    http.Response res = await http.post(
-      Uri.parse(pasienkURL),
-      headers: <String, String>{
-        'Content-Type': 'application/json; charset=UTF-8',
-      },
-      body: jsonEncode(items[name]),
-    );
-
-    if (res.statusCode == 200) {
-      List<dynamic> body = jsonDecode(res.body);
-      _items = {};
-      print(body);
-    } else {
-      throw "Unable to retrieve posts.";
+    try {
+      await HttpService().addNewPasien(items[name]);
+    } catch (error) {
+      rethrow;
     }
+    notifyListeners();
+  }
 
-    print(items[name]?.visitasi?.hasil_bakteri);
-    print(name);
+  Future<void> getPasienList() async {
+    try {
+      final data = await HttpService().getPasien();
+      var finalData = data.map((e) => PasienList.fromJson(e)).toList();
+      _pasienList = finalData;
+    } catch (error) {
+      rethrow;
+    }
+    notifyListeners();
+  }
+
+  Future<void> getPasienById(int id) async {
+    _pasienDetail = {};
+    pemberianAntibiotikDetail = [];
+    riwayatAntibiotik = [];
+    try {
+      final data = await HttpService().getPasienById(id);
+      _pasienDetail = data;
+      pemberianAntibiotikDetail = ((data['visitasi']['riwayat_antibiotik']
+                  ?['pemberian_antibiotik'] ??
+              []) as List<dynamic>)
+          .map((e) => PemberianAntibiotik.fromJson(e))
+          .toList();
+
+      riwayatAntibiotik = ((data['visitasi']['riwayat_antibiotik']
+                  ?['pemberian_antibiotik'] ??
+              []) as List<dynamic>)
+          .map((e) =>
+              Data(id: e['antibiotik']?['id'], name: e['antibiotik']?['name']))
+          .toList();
+    } catch (error) {
+      rethrow;
+    }
+    notifyListeners();
+  }
+
+  Future<void> deletePasien(int id) async {
+    try {
+      await HttpService().deletePasien(id);
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  Future<void> updatePasien() async {
+    var data = Pasien(
+        name: name ?? pasienDetail['name'],
+        tanggal_lahir: tanggalLahir ?? pasienDetail['tanggal_lahir'],
+        no_hp: noHp ?? pasienDetail['no_hp'].toString(),
+        gender: gender ?? pasienDetail['gender'],
+        alamat: alamat ?? pasienDetail['alamat'],
+        komorbid: komorbid ?? pasienDetail['komorbid']);
+
+    Logger().d(data.komorbid);
+
+    try {
+      await HttpService().updatePasien(data, pasienDetail['id']);
+      await getPasienById(pasienDetail['id']);
+    } catch (e) {
+      rethrow;
+    }
     notifyListeners();
   }
 }

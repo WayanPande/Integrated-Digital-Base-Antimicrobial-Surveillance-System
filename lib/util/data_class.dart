@@ -21,6 +21,37 @@ class Antibiotik {
   });
 }
 
+class PasienList {
+  String name;
+  String tanggal_lahir;
+  int no_hp;
+  String gender;
+  String alamat;
+  String komorbid;
+  int id;
+
+  PasienList({
+    required this.id,
+    required this.name,
+    required this.tanggal_lahir,
+    required this.no_hp,
+    required this.gender,
+    required this.alamat,
+    required this.komorbid,
+  });
+
+  factory PasienList.fromJson(Map<String, dynamic> json) {
+    return PasienList(
+        id: json['id'] as int,
+        name: json['name'] as String,
+        tanggal_lahir: json['tanggal_lahir'] as String,
+        no_hp: json['no_hp'] as int,
+        gender: json['gender'] as String,
+        alamat: json['alamat'] as String,
+        komorbid: json['komorbid'] as String);
+  }
+}
+
 class Pasien {
   String? name;
   String? tanggal_lahir;
@@ -54,12 +85,10 @@ class Pasien {
     gender = json['gender'];
     alamat = json['alamat'];
     komorbid = json['komorbid'];
-    visitasi = json['visitasi'] != null
-        ? Visitasi.fromJson(json['visitasi'])
-        : null;
-    spesimen = json['spesimen'] != null
-        ? Spesimen.fromJson(json['spesimen'])
-        : null;
+    visitasi =
+        json['visitasi'] != null ? Visitasi.fromJson(json['visitasi']) : null;
+    spesimen =
+        json['spesimen'] != null ? Spesimen.fromJson(json['spesimen']) : null;
     if (json['antibiotik_sensitif'] != null) {
       antibiotik_sensitif = <AntibiotikSensitif>[];
       json['antibiotik_sensitif'].forEach((v) {
@@ -67,18 +96,18 @@ class Pasien {
       });
     }
     riwayat_antibiotik = json['riwayat_antibiotik'] != null
-        ?  RiwayatAntibiotik.fromJson(json['riwayat_antibiotik'])
+        ? RiwayatAntibiotik.fromJson(json['riwayat_antibiotik'])
         : null;
     if (json['pemberian_antibiotik'] != null) {
       pemberianAntibiotik = <PemberianAntibiotik>[];
       json['pemberian_antibiotik'].forEach((v) {
-        pemberianAntibiotik!.add( PemberianAntibiotik.fromJson(v));
+        pemberianAntibiotik!.add(PemberianAntibiotik.fromJson(v));
       });
     }
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data =  <String, dynamic>{};
+    final Map<String, dynamic> data = <String, dynamic>{};
     data['name'] = this.name;
     data['tanggal_lahir'] = this.tanggal_lahir;
     data['no_hp'] = this.no_hp;
@@ -135,7 +164,7 @@ class Visitasi {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data =  <String, dynamic>{};
+    final Map<String, dynamic> data = <String, dynamic>{};
     data['dx_sementara'] = this.dx_sementara;
     data['dx_definitif'] = this.dx_definitif;
     data['jenis_perawatan'] = this.jenis_perawatan;
@@ -157,7 +186,7 @@ class Spesimen {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data =  <String, dynamic>{};
+    final Map<String, dynamic> data = <String, dynamic>{};
     data['name'] = this.name;
     return data;
   }
@@ -173,7 +202,7 @@ class AntibiotikSensitif {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data =  <String, dynamic>{};
+    final Map<String, dynamic> data = <String, dynamic>{};
     data['id_antibiotik'] = this.id_antibiotik;
     return data;
   }
@@ -194,7 +223,7 @@ class RiwayatAntibiotik {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data =  <String, dynamic>{};
+    final Map<String, dynamic> data = <String, dynamic>{};
     data['kombinasi_antibiotik'] = this.kombinasi_antibiotik;
     data['reaksi_obat'] = this.reaksi_obat;
     data['efek_samping'] = this.efek_samping;
@@ -209,7 +238,10 @@ class PemberianAntibiotik {
   int? lamaPemberian;
 
   PemberianAntibiotik(
-      {this.id_antibiotik, this.jalurPemberian, this.dosis, this.lamaPemberian});
+      {this.id_antibiotik,
+      this.jalurPemberian,
+      this.dosis,
+      this.lamaPemberian});
 
   PemberianAntibiotik.fromJson(Map<String, dynamic> json) {
     id_antibiotik = json['id_antibiotik'];
@@ -219,7 +251,7 @@ class PemberianAntibiotik {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data =  <String, dynamic>{};
+    final Map<String, dynamic> data = <String, dynamic>{};
     data['id_antibiotik'] = this.id_antibiotik;
     data['jalur_pemberian'] = this.jalurPemberian;
     data['dosis'] = this.dosis;

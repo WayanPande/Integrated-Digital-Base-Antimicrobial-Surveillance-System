@@ -1,10 +1,24 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:project_pak_gusan/providers/antibiotik.dart';
 import 'package:project_pak_gusan/providers/patients.dart';
 import 'package:project_pak_gusan/screens/login_screen.dart';
 import 'package:provider/provider.dart';
 
-void main() {
+class MyHttpOverrides extends HttpOverrides {
+  @override
+  HttpClient createHttpClient(SecurityContext? context) {
+    return super.createHttpClient(context)
+      ..badCertificateCallback =
+          (X509Certificate cert, String host, int port) => true;
+  }
+}
+
+Future<void> main() async {
+  HttpOverrides.global = MyHttpOverrides();
+  await dotenv.load(fileName: ".env");
   runApp(const MyApp());
 }
 

@@ -3,8 +3,11 @@ import 'package:project_pak_gusan/screens/profile_patien_screen.dart';
 
 class PatienCard extends StatelessWidget {
   final String name, umur;
+  final int id;
 
-  const PatienCard({Key? key, required this.name, required this.umur}) : super(key: key);
+  const PatienCard(
+      {Key? key, required this.name, required this.umur, required this.id})
+      : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -19,12 +22,15 @@ class PatienCard extends StatelessWidget {
             context,
             MaterialPageRoute(
               builder: (context) {
-                return ProfilePatienScreen(name: name, umur: umur,);
+                return ProfilePatienScreen(
+                  id: id,
+                );
               },
             ),
           );
         },
         child: Container(
+          width: double.infinity,
           padding: const EdgeInsets.symmetric(
             horizontal: 15,
             vertical: 10,
@@ -38,7 +44,7 @@ class PatienCard extends StatelessWidget {
                     width: 30,
                     height: 30,
                     decoration: BoxDecoration(
-                      image:  DecorationImage(
+                      image: DecorationImage(
                         image: NetworkImage(
                           "https://avatars.dicebear.com/api/adventurer-neutral/${name}.jpg",
                         ),
@@ -52,11 +58,14 @@ class PatienCard extends StatelessWidget {
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(
-                        name,
-                        style: const TextStyle(
-                          fontWeight: FontWeight.w600,
-                          fontSize: 15,
+                      SizedBox(
+                        width: 250,
+                        child: Text(
+                          name,
+                          style: const TextStyle(
+                            fontWeight: FontWeight.w600,
+                            fontSize: 15,
+                          ),
                         ),
                       ),
                       const SizedBox(

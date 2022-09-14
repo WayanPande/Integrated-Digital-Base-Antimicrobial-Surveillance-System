@@ -56,6 +56,34 @@ class _AddPatienAntibiotikState extends State<AddPatienAntibiotik> {
     return;
   }
 
+  showLoaderDialog(BuildContext context) {
+    AlertDialog alert = AlertDialog(
+      backgroundColor: Colors.transparent,
+      elevation: 0,
+      content: Wrap(
+        children: [
+          Center(
+            child: Container(
+              decoration: const BoxDecoration(
+                shape: BoxShape.circle,
+                color: Colors.white,
+              ),
+              padding: const EdgeInsets.all(15),
+              child: const CircularProgressIndicator(),
+            ),
+          ),
+        ],
+      ),
+    );
+    showDialog(
+      barrierDismissible: false,
+      context: context,
+      builder: (BuildContext context) {
+        return alert;
+      },
+    );
+  }
+
   Future<void> _showMyDialog() async {
     return await showDialog<void>(
       context: context,
@@ -707,37 +735,35 @@ class _AddPatienAntibiotikState extends State<AddPatienAntibiotik> {
                           btnOkColor: const Color(0xFF20BDB7),
                           btnCancelOnPress: () {},
                           btnOkOnPress: () {
-                            pasien.addPatien();
-
-                            AwesomeDialog(
-                              context: context,
-                              dialogType: DialogType.success,
-                              dismissOnTouchOutside: false,
-                              animType: AnimType.bottomSlide,
-                              title: 'Pasien berhasil ditambahkan !',
-                              autoHide: const Duration(seconds: 3),
-                              btnOkColor: const Color(0xFF20BDB7),
-                              onDismissCallback: (e) {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) {
-                                      return const HomeScreen();
-                                    },
-                                  ),
-                                );
+                            showLoaderDialog(context);
+                            pasien.addPatien().then(
+                              (_) {
+                                Navigator.of(context).pop();
+                                AwesomeDialog(
+                                  context: context,
+                                  dialogType: DialogType.success,
+                                  dismissOnTouchOutside: false,
+                                  animType: AnimType.bottomSlide,
+                                  title: 'Pasien berhasil ditambahkan !',
+                                  autoHide: const Duration(seconds: 3),
+                                  btnOkColor: const Color(0xFF20BDB7),
+                                  onDismissCallback: (e) {
+                                    Navigator.of(context).pushAndRemoveUntil(MaterialPageRoute(builder: (context) =>
+                                        const HomeScreen()), (Route<dynamic> route) => false);
+                                  },
+                                  btnOkOnPress: () {
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) {
+                                          return const HomeScreen();
+                                        },
+                                      ),
+                                    );
+                                  },
+                                ).show();
                               },
-                              btnOkOnPress: () {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) {
-                                      return const HomeScreen();
-                                    },
-                                  ),
-                                );
-                              },
-                            ).show();
+                            );
                           },
                         ).show();
                       },

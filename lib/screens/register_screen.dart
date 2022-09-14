@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:project_pak_gusan/screens/login_screen.dart';
-import 'package:project_pak_gusan/service/http_service.dart';
 
 import '../util/data_drop_down.dart';
 import '../widget/authentication_header.dart';
@@ -17,16 +16,11 @@ class _RegisterScreenState extends State<RegisterScreen> {
   double heightSpacing = 25;
   int _jenisDokter = 1;
 
-
-  String _selectedJenisSpesialis = "Spesialis Akupunktur Medik", _selectedKlinik = "Klinik Asih Usadha", _selectedRumahSakit = "RS Bali Royal", _selectedPuskesmas = "Puskesmas I Denpasar Utara", _selectedPoliklinik = "Klinik Utama Dharma Sidhi";
-
-  final HttpService httpService = HttpService();
-
-  @override
-  void initState() {
-    super.initState();
-    httpService.getKlinik();
-  }
+  String _selectedJenisSpesialis = "Spesialis Akupunktur Medik",
+      _selectedKlinik = "Klinik Asih Usadha",
+      _selectedRumahSakit = "RS Bali Royal",
+      _selectedPuskesmas = "Puskesmas I Denpasar Utara",
+      _selectedPoliklinik = "Klinik Utama Dharma Sidhi";
 
   @override
   Widget build(BuildContext context) {

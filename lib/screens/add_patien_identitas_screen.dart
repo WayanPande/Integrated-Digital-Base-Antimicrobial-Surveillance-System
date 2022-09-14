@@ -1,7 +1,9 @@
+import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:project_pak_gusan/providers/patients.dart';
 import 'package:project_pak_gusan/screens/add_patien_riwayat_screen.dart';
+import 'package:project_pak_gusan/screens/profile_patien_screen.dart';
 import 'package:provider/provider.dart';
 
 class AddPatienIdentitas extends StatefulWidget {
@@ -20,11 +22,37 @@ class _AddPatienIdentitasState extends State<AddPatienIdentitas> {
 
   final List<String> jenisKelamin = ["Laki - Laki", "Wanita"];
 
-  String _selectedJenisKelamin = "Laki - Laki";
+  String _selectedJenisKelamin = "Laki - Laki", tanggalLahirSend = "";
+
+  bool helper = true;
+
+  void setInitialDataForUpdatingPasien(Map<String, dynamic> data) {
+    nama.text = data["name"];
+    noHp.text = data["no_hp"].toString();
+    tanggalLahir.text = DateFormat('dd, MMMM yyyy')
+        .format(DateTime.parse(data['tanggal_lahir']));
+    alamat.text = data['alamat'];
+    komorbid.text = data['komorbid'];
+  }
+
+  @override
+  void initState() {
+    setState(() {
+      helper = true;
+    });
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
     final pasien = Provider.of<Patiens>(context, listen: false);
+
+    if (pasien.isEditing && helper) {
+      setInitialDataForUpdatingPasien(pasien.pasienDetail);
+      setState(() {
+        helper = false;
+      });
+    }
 
     nama.addListener(() {
       pasien.name = nama.text;
@@ -52,9 +80,9 @@ class _AddPatienIdentitasState extends State<AddPatienIdentitas> {
       backgroundColor: Colors.white,
       appBar: AppBar(
         centerTitle: true,
-        title: const Text(
-          "Tambah Pasien Baru",
-          style: TextStyle(
+        title: Text(
+          pasien.isEditing ? "Ubah Data Pasien" : "Tambah Pasien Baru",
+          style: const TextStyle(
             fontWeight: FontWeight.bold,
           ),
         ),
@@ -232,14 +260,55 @@ class _AddPatienIdentitasState extends State<AddPatienIdentitas> {
                 children: [
                   ElevatedButton(
                     onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) {
-                            return const AddPatienRiwayat();
+                      if (pasien.isEditing) {
+                        AwesomeDialog(
+                          context: context,
+                          dialogType: DialogType.warning,
+                          dismissOnTouchOutside: false,
+                          animType: AnimType.bottomSlide,
+                          title: 'Apakah anda yakin ?',
+                          desc: 'Tekan tombol ya untuk melanjutkan',
+                          btnOkText: "Ya, lanjutkan",
+                          btnCancel: TextButton(
+                            child: const Text("cancel"),
+                            onPressed: () {
+                              Navigator.of(context).pop();
+                            },
+                          ),
+                          btnOkColor: const Color(0xFF20BDB7),
+                          btnCancelOnPress: () {},
+                          btnOkOnPress: () {
+                            pasien.updatePasien().then(
+                              (_) {
+                                AwesomeDialog(
+                                  context: context,
+                                  dialogType: DialogType.success,
+                                  dismissOnTouchOutside: false,
+                                  animType: AnimType.bottomSlide,
+                                  title: 'Pasien berhasil diupdate !',
+                                  autoHide: const Duration(seconds: 3),
+                                  btnOkColor: const Color(0xFF20BDB7),
+                                  onDismissCallback: (e) {
+                                    Navigator.of(context).pop();
+                                  },
+                                  btnOkOnPress: () {
+                                    Navigator.pop(context);
+                                  },
+                                ).show();
+                              },
+                            );
                           },
-                        ),
-                      );
+                        ).show();
+                      } else {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) {
+                              return const AddPatienRiwayat();
+                            },
+                          ),
+                        );
+                      }
                     },
                     style: ElevatedButton.styleFrom(
                       shape: RoundedRectangleBorder(
@@ -248,9 +317,9 @@ class _AddPatienIdentitasState extends State<AddPatienIdentitas> {
                       padding: const EdgeInsets.symmetric(
                           vertical: 15, horizontal: 15),
                     ),
-                    child: const Text(
-                      "Selanjutnya",
-                      style: TextStyle(
+                    child: Text(
+                      pasien.isEditing ? "Update" : "Selanjutnya",
+                      style: const TextStyle(
                         color: Colors.white,
                       ),
                     ),
