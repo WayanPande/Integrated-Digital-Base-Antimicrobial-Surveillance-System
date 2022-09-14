@@ -26,6 +26,9 @@ class _AddPatienIdentitasState extends State<AddPatienIdentitas> {
 
   bool helper = true;
 
+  final _formKey = GlobalKey<FormState>();
+
+
   void setInitialDataForUpdatingPasien(Map<String, dynamic> data) {
     nama.text = data["name"];
     noHp.text = data["no_hp"].toString();
@@ -76,6 +79,7 @@ class _AddPatienIdentitasState extends State<AddPatienIdentitas> {
 
     pasien.gender = _selectedJenisKelamin;
 
+
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
@@ -92,241 +96,292 @@ class _AddPatienIdentitasState extends State<AddPatienIdentitas> {
       body: SingleChildScrollView(
         child: Padding(
           padding: const EdgeInsets.all(40),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const Text(
-                "Integrated Digital - Base Antimicrobial Surveillance System (IDAAS)",
-                style: TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.bold,
+          child: Form(
+            key: _formKey,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Text(
+                  "Integrated Digital - Base Antimicrobial Surveillance System (IDAAS)",
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                  ),
+                  textAlign: TextAlign.center,
                 ),
-                textAlign: TextAlign.center,
-              ),
-              const SizedBox(
-                height: 30,
-              ),
-              const Text(
-                "Identitas Pasien",
-                style: TextStyle(
-                  fontWeight: FontWeight.w900,
-                  fontSize: 16,
+                const SizedBox(
+                  height: 30,
                 ),
-              ),
-              const SizedBox(
-                height: 30,
-              ),
-              TextFormField(
-                controller: nama,
-                decoration: const InputDecoration(
-                  labelText: 'Nama',
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.all(
-                      Radius.circular(15),
+                const Text(
+                  "Identitas Pasien",
+                  style: TextStyle(
+                    fontWeight: FontWeight.w900,
+                    fontSize: 16,
+                  ),
+                ),
+                const SizedBox(
+                  height: 30,
+                ),
+                TextFormField(
+                  controller: nama,
+                  decoration: const InputDecoration(
+                    labelText: 'Nama',
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.all(
+                        Radius.circular(15),
+                      ),
                     ),
                   ),
-                ),
-                keyboardType: TextInputType.name,
-              ),
-              const SizedBox(
-                height: 30,
-              ),
-              TextField(
-                onTap: () async {
-                  DateTime? pickedDate = await showDatePicker(
-                    context: context,
-                    initialDate: DateTime.now(),
-                    firstDate: DateTime(1950),
-                    lastDate: DateTime(2100),
-                  );
-
-                  if (pickedDate != null) {
-                    print(
-                        pickedDate); //pickedDate output format => 2021-03-10 00:00:00.000
-                    String formattedDate =
-                        DateFormat('dd, MMMM yyyy').format(pickedDate);
-                    print(
-                        formattedDate); //formatted date output using intl package =>  2021-03-16
-                    setState(() {
-                      tanggalLahir.text =
-                          formattedDate; //set output date to TextField value.
-                    });
-                  } else {}
-                },
-                readOnly: true,
-                controller: tanggalLahir,
-                decoration: const InputDecoration(
-                  labelText: 'Tanggal Lahir',
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.all(
-                      Radius.circular(15),
-                    ),
-                  ),
-                ),
-              ),
-              const SizedBox(
-                height: 30,
-              ),
-              TextFormField(
-                controller: noHp,
-                decoration: const InputDecoration(
-                  labelText: 'No Handphone',
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.all(
-                      Radius.circular(15),
-                    ),
-                  ),
-                ),
-                keyboardType: TextInputType.phone,
-              ),
-              const SizedBox(
-                height: 30,
-              ),
-              const Text(
-                "Jenis Kelamin",
-                style: TextStyle(
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              const SizedBox(
-                height: 10,
-              ),
-              DecoratedBox(
-                decoration: BoxDecoration(
-                  border: Border.all(
-                    color: Colors.black38,
-                    width: 1,
-                  ),
-                  borderRadius: BorderRadius.circular(15),
-                ),
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 15,
-                    vertical: 5,
-                  ),
-                  child: DropdownButton(
-                    value: _selectedJenisKelamin,
-                    items: jenisKelamin
-                        .map((code) =>
-                            DropdownMenuItem(value: code, child: Text(code)))
-                        .toList(),
-                    onChanged: (index) {
-                      setState(() {
-                        _selectedJenisKelamin = index.toString();
-                      });
-                      pasien.gender = index.toString();
-                    },
-                    isExpanded: true,
-                    underline: Container(),
-                  ),
-                ),
-              ),
-              const SizedBox(
-                height: 30,
-              ),
-              TextFormField(
-                controller: alamat,
-                decoration: const InputDecoration(
-                  labelText: 'Alamat',
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.all(
-                      Radius.circular(15),
-                    ),
-                  ),
-                ),
-                keyboardType: TextInputType.streetAddress,
-              ),
-              const SizedBox(
-                height: 30,
-              ),
-              TextFormField(
-                controller: komorbid,
-                decoration: const InputDecoration(
-                  labelText: 'Ada Komorbid ?',
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.all(
-                      Radius.circular(15),
-                    ),
-                  ),
-                ),
-                maxLines: 4,
-                keyboardType: TextInputType.streetAddress,
-              ),
-              const SizedBox(
-                height: 30,
-              ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.end,
-                children: [
-                  ElevatedButton(
-                    onPressed: () {
-                      if (pasien.isEditing) {
-                        AwesomeDialog(
-                          context: context,
-                          dialogType: DialogType.warning,
-                          dismissOnTouchOutside: false,
-                          animType: AnimType.bottomSlide,
-                          title: 'Apakah anda yakin ?',
-                          desc: 'Tekan tombol ya untuk melanjutkan',
-                          btnOkText: "Ya, lanjutkan",
-                          btnCancel: TextButton(
-                            child: const Text("cancel"),
-                            onPressed: () {
-                              Navigator.of(context).pop();
-                            },
-                          ),
-                          btnOkColor: const Color(0xFF20BDB7),
-                          btnCancelOnPress: () {},
-                          btnOkOnPress: () {
-                            pasien.updatePasien().then(
-                              (_) {
-                                AwesomeDialog(
-                                  context: context,
-                                  dialogType: DialogType.success,
-                                  dismissOnTouchOutside: false,
-                                  animType: AnimType.bottomSlide,
-                                  title: 'Pasien berhasil diupdate !',
-                                  autoHide: const Duration(seconds: 3),
-                                  btnOkColor: const Color(0xFF20BDB7),
-                                  onDismissCallback: (e) {
-                                    Navigator.of(context).pop();
-                                  },
-                                  btnOkOnPress: () {
-                                    Navigator.pop(context);
-                                  },
-                                ).show();
-                              },
-                            );
-                          },
-                        ).show();
-                      } else {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) {
-                              return const AddPatienRiwayat();
-                            },
-                          ),
-                        );
+                  keyboardType: TextInputType.name,
+                  validator: (value){
+                    if(value != null) {
+                      if(value.isEmpty) {
+                        return "Nama Tidak Boleh Kosong";
                       }
-                    },
-                    style: ElevatedButton.styleFrom(
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(14),
+                    }
+                    return null;
+                  },
+                ),
+                const SizedBox(
+                  height: 30,
+                ),
+                TextFormField(
+                  validator: (value){
+                    if(value != null) {
+                      if(value.isEmpty) {
+                        return "Tanggal Lahir Tidak Boleh Kosong";
+                      }
+                    }
+                    return null;
+                  },
+                  onTap: () async {
+                    DateTime? pickedDate = await showDatePicker(
+                      context: context,
+                      initialDate: DateTime.now(),
+                      firstDate: DateTime(1950),
+                      lastDate: DateTime(2100),
+                    );
+
+                    if (pickedDate != null) {
+                      print(
+                          pickedDate); //pickedDate output format => 2021-03-10 00:00:00.000
+                      String formattedDate =
+                      DateFormat('dd, MMMM yyyy').format(pickedDate);
+                      print(
+                          formattedDate); //formatted date output using intl package =>  2021-03-16
+                      setState(() {
+                        tanggalLahir.text =
+                            formattedDate; //set output date to TextField value.
+                      });
+                    } else {}
+                  },
+                  readOnly: true,
+                  controller: tanggalLahir,
+                  decoration: const InputDecoration(
+                    labelText: 'Tanggal Lahir',
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.all(
+                        Radius.circular(15),
                       ),
-                      padding: const EdgeInsets.symmetric(
-                          vertical: 15, horizontal: 15),
                     ),
-                    child: Text(
-                      pasien.isEditing ? "Update" : "Selanjutnya",
-                      style: const TextStyle(
-                        color: Colors.white,
+                  ),
+                ),
+                const SizedBox(
+                  height: 30,
+                ),
+                TextFormField(
+                  validator: (value){
+                    if(value != null) {
+                      if(value.isEmpty) {
+                        return "No Hp Tidak Boleh Kosong";
+                      }
+
+                      if(int.tryParse(value) == null){
+                        return "No Hp Harus Angka";
+                      }
+                    }
+                    return null;
+                  },
+                  controller: noHp,
+                  decoration: const InputDecoration(
+                    labelText: 'No Handphone',
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.all(
+                        Radius.circular(15),
                       ),
                     ),
-                  )
-                ],
-              )
-            ],
+                  ),
+                  keyboardType: TextInputType.phone,
+                ),
+                const SizedBox(
+                  height: 30,
+                ),
+                const Text(
+                  "Jenis Kelamin",
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                const SizedBox(
+                  height: 10,
+                ),
+                DecoratedBox(
+                  decoration: BoxDecoration(
+                    border: Border.all(
+                      color: Colors.black38,
+                      width: 1,
+                    ),
+                    borderRadius: BorderRadius.circular(15),
+                  ),
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 15,
+                      vertical: 5,
+                    ),
+                    child: DropdownButton(
+                      value: _selectedJenisKelamin,
+                      items: jenisKelamin
+                          .map((code) =>
+                          DropdownMenuItem(value: code, child: Text(code)))
+                          .toList(),
+                      onChanged: (index) {
+                        setState(() {
+                          _selectedJenisKelamin = index.toString();
+                        });
+                        pasien.gender = index.toString();
+                      },
+                      isExpanded: true,
+                      underline: Container(),
+                    ),
+                  ),
+                ),
+                const SizedBox(
+                  height: 30,
+                ),
+                TextFormField(
+                  validator: (value){
+                    if(value != null) {
+                      if(value.isEmpty) {
+                        return "Alamat Tidak Boleh Kosong";
+                      }
+                    }
+                    return null;
+                  },
+                  controller: alamat,
+                  decoration: const InputDecoration(
+                    labelText: 'Alamat',
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.all(
+                        Radius.circular(15),
+                      ),
+                    ),
+                  ),
+                  keyboardType: TextInputType.streetAddress,
+                ),
+                const SizedBox(
+                  height: 30,
+                ),
+                TextFormField(
+                  validator: (value){
+                    if(value != null) {
+                      if(value.isEmpty) {
+                        return "Komorbid Tidak Boleh Kosong";
+                      }
+                    }
+                    return null;
+                  },
+                  controller: komorbid,
+                  decoration: const InputDecoration(
+                    labelText: 'Ada Komorbid ?',
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.all(
+                        Radius.circular(15),
+                      ),
+                    ),
+                  ),
+                  maxLines: 4,
+                  keyboardType: TextInputType.streetAddress,
+                ),
+                const SizedBox(
+                  height: 30,
+                ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    ElevatedButton(
+                      onPressed: () {
+
+                        if(_formKey.currentState!.validate()){
+                          if (pasien.isEditing) {
+                            AwesomeDialog(
+                              context: context,
+                              dialogType: DialogType.warning,
+                              dismissOnTouchOutside: false,
+                              animType: AnimType.bottomSlide,
+                              title: 'Apakah anda yakin ?',
+                              desc: 'Tekan tombol ya untuk melanjutkan',
+                              btnOkText: "Ya, lanjutkan",
+                              btnCancel: TextButton(
+                                child: const Text("cancel"),
+                                onPressed: () {
+                                  Navigator.of(context).pop();
+                                },
+                              ),
+                              btnOkColor: const Color(0xFF20BDB7),
+                              btnCancelOnPress: () {},
+                              btnOkOnPress: () {
+                                pasien.updatePasien().then(
+                                      (_) {
+                                    AwesomeDialog(
+                                      context: context,
+                                      dialogType: DialogType.success,
+                                      dismissOnTouchOutside: false,
+                                      animType: AnimType.bottomSlide,
+                                      title: 'Pasien berhasil diupdate !',
+                                      autoHide: const Duration(seconds: 3),
+                                      btnOkColor: const Color(0xFF20BDB7),
+                                      onDismissCallback: (e) {
+                                        Navigator.of(context).pop();
+                                      },
+                                      btnOkOnPress: () {
+                                        Navigator.pop(context);
+                                      },
+                                    ).show();
+                                  },
+                                );
+                              },
+                            ).show();
+                          } else {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) {
+                                  return const AddPatienRiwayat();
+                                },
+                              ),
+                            );
+                          }
+                        }
+
+                      },
+                      style: ElevatedButton.styleFrom(
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(14),
+                        ),
+                        padding: const EdgeInsets.symmetric(
+                            vertical: 15, horizontal: 15),
+                      ),
+                      child: Text(
+                        pasien.isEditing ? "Update" : "Selanjutnya",
+                        style: const TextStyle(
+                          color: Colors.white,
+                        ),
+                      ),
+                    )
+                  ],
+                )
+              ],
+            ),
           ),
         ),
       ),
