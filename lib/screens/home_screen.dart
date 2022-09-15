@@ -149,7 +149,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                 SizedBox(
                                   width: 250,
                                   child: Text(
-                                    doctor.dokterDetail.nama!,
+                                    doctor.dokterDetail.nama ?? "",
                                     style: const TextStyle(
                                       fontWeight: FontWeight.bold,
                                       fontSize: 20,
@@ -165,7 +165,7 @@ class _HomeScreenState extends State<HomeScreen> {
                               decoration: BoxDecoration(
                                 image: DecorationImage(
                                   image: NetworkImage(
-                                    "https://avatars.dicebear.com/api/adventurer-neutral/${doctor.dokterDetail.nama!}.jpg",
+                                    "https://avatars.dicebear.com/api/adventurer-neutral/${doctor.dokterDetail.nama ?? ""}.jpg",
                                   ),
                                 ),
                                 borderRadius: BorderRadius.circular(15),

@@ -319,7 +319,8 @@ class _ProfilePatienScreenState extends State<ProfilePatienScreen> {
                                         (BuildContext context, int index) {
                                       return AntibiotikCard(
                                         namaAntibiotik: pasien.riwayatAntibiotik[index].name,
-                                        dosis: '10 mg',
+                                        dosis: '${pasien.pasienDetail['visitasi']['riwayat_antibiotik']
+                                        ?['pemberian_antibiotik'][index]['dosis']} mg',
                                       );
                                     },
                                     separatorBuilder:
