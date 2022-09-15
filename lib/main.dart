@@ -2,11 +2,15 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:logger/logger.dart';
 import 'package:project_pak_gusan/providers/antibiotik.dart';
 import 'package:project_pak_gusan/providers/doctors.dart';
 import 'package:project_pak_gusan/providers/patients.dart';
+import 'package:project_pak_gusan/screens/home_screen.dart';
 import 'package:project_pak_gusan/screens/login_screen.dart';
+import 'package:project_pak_gusan/util/sharedPreferences.dart';
 import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class MyHttpOverrides extends HttpOverrides {
   @override
@@ -46,6 +50,7 @@ class MyApp extends StatelessWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
+
     return MultiProvider(
       providers: [
         ChangeNotifierProvider(
@@ -65,7 +70,16 @@ class MyApp extends StatelessWidget {
           primarySwatch: kToDark,
         ),
         debugShowCheckedModeBanner: false,
-        home: const LoginScreen(),
+        home: FutureBuilder(
+          future: getDoktorId(),
+          builder: (BuildContext context, AsyncSnapshot snapshot){
+            if(snapshot.hasData) {
+              return const HomeScreen();
+            }else {
+              return const LoginScreen();
+            }
+          },
+        ),
       ),
     );
   }

@@ -1,7 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:logger/logger.dart';
+import 'package:project_pak_gusan/providers/doctors.dart';
 import 'package:project_pak_gusan/providers/patients.dart';
 import 'package:project_pak_gusan/screens/add_patien_identitas_screen.dart';
+import 'package:project_pak_gusan/screens/profile_doctor_screen.dart';
+import 'package:project_pak_gusan/util/sharedPreferences.dart';
 import 'package:project_pak_gusan/widget/patient_card.dart';
 import 'package:provider/provider.dart';
 
@@ -20,6 +24,8 @@ class _HomeScreenState extends State<HomeScreen> {
 
   List<PasienList> _pasienList = [];
 
+  int id = 0;
+
   @override
   void initState() {
     setState(() {
@@ -27,6 +33,7 @@ class _HomeScreenState extends State<HomeScreen> {
     });
     Future.delayed(Duration.zero).then((_) {
       Provider.of<Patiens>(context, listen: false).getPasienList();
+      Provider.of<Doctors>(context, listen: false).getDokter();
     }).then((_) {
       setState(() {
         _isLoading = false;
@@ -39,11 +46,20 @@ class _HomeScreenState extends State<HomeScreen> {
     await Provider.of<Patiens>(context, listen: false).getPasienList();
   }
 
+  Future<void> _saveDoctorId(BuildContext context) async {
+    var temp = await getDoktorId();
+    setState((){
+      id =  temp ?? 0;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     var pasien = Provider.of<Patiens>(context);
-
+    var doctor = Provider.of<Doctors>(context);
     _pasienList = pasien.pasienList;
+
+    _saveDoctorId(context);
 
 
     return Scaffold(
@@ -101,46 +117,62 @@ class _HomeScreenState extends State<HomeScreen> {
                         ),
                         textAlign: TextAlign.center,
                       ),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: const [
-                              Text(
-                                "Selamat datang",
-                                style: TextStyle(
-                                  fontSize: 13,
-                                  color: Colors.white,
-                                ),
-                              ),
-                              SizedBox(
-                                height: 10,
-                              ),
-                              Text(
-                                "Jacob Jones",
-                                style: TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 20,
-                                  color: Colors.white,
-                                ),
-                              ),
-                            ],
-                          ),
-                          Container(
-                            width: 70,
-                            height: 70,
-                            decoration: BoxDecoration(
-                              image: const DecorationImage(
-                                image: NetworkImage(
-                                  "https://avatars.dicebear.com/api/adventurer-neutral/joko.jpg",
-                                ),
-                              ),
-                              borderRadius: BorderRadius.circular(15),
+                      InkWell(
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) {
+                                return const ProfileDoctorScreen();
+                              },
                             ),
-                          ),
-                        ],
+                          );
+                        },
+                        borderRadius: BorderRadius.circular(10),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children:  [
+                                const Text(
+                                  "Selamat datang",
+                                  style: TextStyle(
+                                    fontSize: 13,
+                                    color: Colors.white,
+                                  ),
+                                ),
+                                const SizedBox(
+                                  height: 10,
+                                ),
+                                SizedBox(
+                                  width: 250,
+                                  child: Text(
+                                    doctor.dokterDetail.nama!,
+                                    style: const TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 20,
+                                      color: Colors.white,
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                            Container(
+                              width: 70,
+                              height: 70,
+                              decoration: BoxDecoration(
+                                image: DecorationImage(
+                                  image: NetworkImage(
+                                    "https://avatars.dicebear.com/api/adventurer-neutral/${doctor.dokterDetail.nama!}.jpg",
+                                  ),
+                                ),
+                                borderRadius: BorderRadius.circular(15),
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
                       Row(
                         children: [

@@ -100,4 +100,41 @@ class HttpService {
       throw "Unable to retrieve posts.";
     }
   }
+
+  Future<Map<String, dynamic>> login(LoginData item) async{
+    final String doktorURL = "${dotenv.env['API_URL']}dokter/login";
+
+    http.Response res = await http
+        .post(
+      Uri.parse(doktorURL),
+      headers: <String, String>{
+        'Content-Type': 'application/json; charset=UTF-8',
+      },
+      body: jsonEncode({
+        "email": item.email,
+        "password": item.password
+      }),
+    );
+
+    if (res.statusCode == 200) {
+      Map<String, dynamic> body = jsonDecode(res.body);
+      return body;
+    } else {
+      throw "Unable to retrieve posts.";
+    }
+  }
+
+
+  Future<Map<String, dynamic>> getDoktor(int id) async {
+    final String pasienURL = "${dotenv.env['API_URL']}dokter/$id";
+    http.Response res = await http.get(Uri.parse(pasienURL));
+
+    if (res.statusCode == 200) {
+      Map<String, dynamic> body = jsonDecode(res.body);
+      return body;
+    } else {
+      throw "Unable to retrieve posts.";
+    }
+  }
+
 }

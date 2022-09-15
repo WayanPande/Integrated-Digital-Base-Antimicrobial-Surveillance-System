@@ -21,6 +21,16 @@ class Antibiotik {
   });
 }
 
+class LoginData {
+
+  final String email, password;
+
+  LoginData({
+    required this.email,
+    required this.password,
+  });
+}
+
 class Doktor {
   String? nama;
   String? email;
