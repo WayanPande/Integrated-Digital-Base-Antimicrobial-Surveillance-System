@@ -23,7 +23,7 @@ class _HomeScreenState extends State<HomeScreen> {
   bool _isLoading = false;
 
   List<PasienList> _pasienList = [];
-
+  TextEditingController searchText = TextEditingController();
   int id = 0;
 
   @override
@@ -32,7 +32,7 @@ class _HomeScreenState extends State<HomeScreen> {
       _isLoading = true;
     });
     Future.delayed(Duration.zero).then((_) {
-      Provider.of<Patiens>(context, listen: false).getPasienList();
+      Provider.of<Patiens>(context, listen: false).getPasienList(null);
       Provider.of<Doctors>(context, listen: false).getDokter();
     }).then((_) {
       setState(() {
@@ -43,7 +43,7 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Future<void> _refreshPasien(BuildContext context) async {
-    await Provider.of<Patiens>(context, listen: false).getPasienList();
+    await Provider.of<Patiens>(context, listen: false).getPasienList(null);
   }
 
   Future<void> _saveDoctorId(BuildContext context) async {
@@ -60,6 +60,10 @@ class _HomeScreenState extends State<HomeScreen> {
     _pasienList = pasien.pasienList;
 
     _saveDoctorId(context);
+
+    void searchPasien() {
+      pasien.getPasienList(searchText.text);
+    }
 
 
     return Scaffold(
@@ -176,10 +180,15 @@ class _HomeScreenState extends State<HomeScreen> {
                       ),
                       Row(
                         children: [
-                          const Expanded(
+                           Expanded(
                             flex: 5,
-                            child: TextField(
-                              decoration: InputDecoration(
+                            child: TextFormField(
+                              controller: searchText,
+                              onFieldSubmitted: (value){
+                                searchPasien();
+                              },
+                              textInputAction: TextInputAction.search,
+                              decoration: const InputDecoration(
                                 border: OutlineInputBorder(
                                   borderSide: BorderSide(
                                       color: Colors.black12, width: 0.0),
@@ -188,7 +197,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                 ),
                                 focusedBorder: OutlineInputBorder(
                                   borderSide: BorderSide(
-                                      color: Colors.black12, width: 0.0),
+                                      color: Colors.white, width: 0.0),
                                   borderRadius:
                                       BorderRadius.all(Radius.circular(16)),
                                 ),
@@ -200,6 +209,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                 ),
                                 hintText: "Cari pasien",
                               ),
+                              keyboardType: TextInputType.text,
                             ),
                           ),
                           const SizedBox(
@@ -208,7 +218,9 @@ class _HomeScreenState extends State<HomeScreen> {
                           Expanded(
                             flex: 1,
                             child: ElevatedButton(
-                              onPressed: () {},
+                              onPressed: () {
+                                searchPasien();
+                              },
                               style: ElevatedButton.styleFrom(
                                 shape: const RoundedRectangleBorder(
                                   borderRadius: BorderRadius.all(

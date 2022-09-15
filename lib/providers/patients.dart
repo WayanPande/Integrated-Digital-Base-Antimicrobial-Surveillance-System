@@ -134,9 +134,9 @@ class Patiens with ChangeNotifier {
     notifyListeners();
   }
 
-  Future<void> getPasienList() async {
+  Future<void> getPasienList(String? name) async {
     try {
-      final data = await HttpService().getPasien();
+      final data = await HttpService().getPasien(name);
       var finalData = data.map((e) => PasienList.fromJson(e)).toList();
       _pasienList = finalData;
     } catch (error) {

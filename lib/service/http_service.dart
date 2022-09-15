@@ -5,8 +5,13 @@ import 'package:http/http.dart' as http;
 import 'package:project_pak_gusan/util/data_class.dart';
 
 class HttpService {
-  Future<List<dynamic>> getPasien() async {
-    final String pasienURL = "${dotenv.env['API_URL']}pasien";
+  Future<List<dynamic>> getPasien(String? name) async {
+    final String pasienURL;
+    if(name != null) {
+      pasienURL = "${dotenv.env['API_URL']}pasien/search/$name";
+    }else{
+      pasienURL = "${dotenv.env['API_URL']}pasien";
+    }
     http.Response res = await http.get(Uri.parse(pasienURL));
 
     if (res.statusCode == 200) {
