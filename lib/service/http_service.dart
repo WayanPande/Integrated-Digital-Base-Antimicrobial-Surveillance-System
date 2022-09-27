@@ -2,7 +2,9 @@ import 'dart:convert';
 
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:http/http.dart' as http;
+import 'package:logger/logger.dart';
 import 'package:project_pak_gusan/util/data_class.dart';
+import 'package:project_pak_gusan/util/sharedPreferences.dart';
 
 class HttpService {
   Future<List<dynamic>> getPasien(String? name) async {
@@ -10,7 +12,7 @@ class HttpService {
     if(name != null) {
       pasienURL = "${dotenv.env['API_URL']}pasien/search/$name";
     }else{
-      pasienURL = "${dotenv.env['API_URL']}pasien";
+      pasienURL = "${dotenv.env['API_URL']}pasien/dokter/${await getDoktorId()}";
     }
     http.Response res = await http.get(Uri.parse(pasienURL));
 
@@ -49,13 +51,17 @@ class HttpService {
   Future<Map<String, dynamic>> addNewPasien(Pasien? item) async {
    final String pasienkURL = "${dotenv.env['API_URL']}pasien";
 
+   var data = jsonEncode(item);
+   var decode = jsonDecode(data);
+    decode["id_dokter"] = await getDoktorId();
+
    http.Response res = await http
        .post(
      Uri.parse(pasienkURL),
      headers: <String, String>{
        'Content-Type': 'application/json; charset=UTF-8',
      },
-     body: jsonEncode(item),
+     body: jsonEncode(decode),
    );
 
    if (res.statusCode == 200) {
