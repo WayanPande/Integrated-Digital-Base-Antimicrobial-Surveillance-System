@@ -133,12 +133,13 @@ class _ProfilePatienScreenState extends State<ProfilePatienScreen> {
                           width: 70,
                           height: 70,
                           decoration: BoxDecoration(
-                            image: DecorationImage(
-                              image: NetworkImage(
-                                "https://avatars.dicebear.com/api/adventurer-neutral/${pasien.pasienDetail['name'] ?? "-"}.jpg",
-                              ),
-                            ),
                             borderRadius: BorderRadius.circular(15),
+                            color: const Color(0xFF20BDB7),
+                          ),
+                          child: const Icon(
+                            Icons.person,
+                            color: Colors.white,
+                            size: 50,
                           ),
                         ),
                         const SizedBox(

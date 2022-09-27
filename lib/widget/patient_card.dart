@@ -44,12 +44,12 @@ class PatienCard extends StatelessWidget {
                     width: 30,
                     height: 30,
                     decoration: BoxDecoration(
-                      image: DecorationImage(
-                        image: NetworkImage(
-                          "https://avatars.dicebear.com/api/adventurer-neutral/${name}.jpg",
-                        ),
-                      ),
                       borderRadius: BorderRadius.circular(8),
+                      color: const Color(0xFF20BDB7),
+                    ),
+                    child: const Icon(
+                      Icons.person,
+                      color: Colors.white,
                     ),
                   ),
                   const SizedBox(
