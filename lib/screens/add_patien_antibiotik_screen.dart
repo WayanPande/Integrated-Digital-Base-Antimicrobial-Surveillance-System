@@ -1,5 +1,6 @@
 import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:flutter/material.dart';
+import 'package:logger/logger.dart';
 import 'package:multi_select_flutter/multi_select_flutter.dart';
 import 'package:multi_select_flutter/util/multi_select_item.dart';
 import 'package:project_pak_gusan/screens/home_screen.dart';
@@ -194,6 +195,7 @@ class _AddPatienAntibiotikState extends State<AddPatienAntibiotik> {
                       height: 30,
                     ),
                     TextFormField(
+                      textInputAction: TextInputAction.next,
                       decoration: const InputDecoration(
                         suffixText: "mg",
                         labelText: 'Dosis',
@@ -212,6 +214,7 @@ class _AddPatienAntibiotikState extends State<AddPatienAntibiotik> {
                       height: 30,
                     ),
                     TextFormField(
+                        textInputAction: TextInputAction.next,
                         decoration: const InputDecoration(
                           suffixText: "Hari",
                           labelText: 'Lama Pemberian',
@@ -265,12 +268,76 @@ class _AddPatienAntibiotikState extends State<AddPatienAntibiotik> {
     );
   }
 
+  bool helper = true;
+
+  void setInitialDataForUpdatingPasien(Map<String, dynamic> data) {
+    var dataRiwayat = data["visitasi"]["riwayat_antibiotik"];
+    if (dataRiwayat["reaksi_obat"] != null) {
+      deskripsiReaksi.text = dataRiwayat["reaksi_obat"];
+      _reaksiAlergi = true;
+    }
+
+    if (dataRiwayat["efek_samping"] != null) {
+      deskripsiEfekSamping.text = dataRiwayat["efek_samping"];
+      _efekSamping = true;
+    }
+
+    _kombinasiAntibiotik = dataRiwayat["kombinasi_antibiotik"];
+
+    if ((dataRiwayat["pemberian_antibiotik"] as List).isNotEmpty) {
+      List<Data> namaAntibiotik = [];
+
+      for (var i = 0; i < dataAntibiotik.length; i++) {
+        namaAntibiotik.add(Data(id: i, name: dataAntibiotik[i]));
+      }
+
+      _namaAntibiotik = [];
+      var dataUserAntibiotik = dataRiwayat["pemberian_antibiotik"] as List;
+      for (var element in dataUserAntibiotik) {
+        _namaAntibiotik.add(namaAntibiotik[element["antibiotik"]["id"] - 1]);
+      }
+    }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    Future.delayed(Duration.zero).then((_) {
+      final pasien = Provider.of<Patiens>(context, listen: false);
+      final antibiotics = Provider.of<Antibiotics>(context, listen: false);
+      antibiotics.removeAllAntibiotik();
+      var pemberianAntibiotik = pasien.pasienDetail["visitasi"]
+          ["riwayat_antibiotik"]["pemberian_antibiotik"] as List;
+
+      if(pemberianAntibiotik.isNotEmpty) {
+        for (var item in pemberianAntibiotik) {
+          Logger().d(item);
+          antibiotics.addAntibiotik(PemberianAntibiotik(
+              lamaPemberian: item["lama_pemberian"],
+              jalurPemberian: item["jalur_pemberian"],
+              dosis: item['dosis'],
+              id_antibiotik: item['antibiotik']['id']));
+        }
+      }
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     final pasien = Provider.of<Patiens>(context, listen: false);
     final antibiotics = Provider.of<Antibiotics>(context);
 
-    pasien.kombinasiAntibiotik = _diberikanAntibiotik;
+    if (pasien.isEditing && helper) {
+      _namaAntibiotik = [];
+      setInitialDataForUpdatingPasien(pasien.pasienDetail);
+      _diberikanAntibiotik = true;
+      _kombinasiAntibiotik = pasien.kombinasiAntibiotik!;
+      setState(() {
+        helper = false;
+      });
+    }
+
+    pasien.kombinasiAntibiotik = _kombinasiAntibiotik;
     pasien.pemberianAntibiotik = antibiotics.items;
 
     deskripsiReaksi.addListener(() {
@@ -285,9 +352,9 @@ class _AddPatienAntibiotikState extends State<AddPatienAntibiotik> {
       backgroundColor: Colors.white,
       appBar: AppBar(
         centerTitle: true,
-        title: const Text(
-          "Tambah Pasien Baru",
-          style: TextStyle(
+        title: Text(
+          pasien.isEditing ? "Ubah Data Pasien" : "Tambah Pasien Baru",
+          style: const TextStyle(
             fontWeight: FontWeight.bold,
           ),
         ),
@@ -465,8 +532,9 @@ class _AddPatienAntibiotikState extends State<AddPatienAntibiotik> {
                             textStyle: const TextStyle(
                               color: Colors.white,
                             ),
-                            onTap: (values) {
+                            onTap: (Data values) {
                               setState(() {
+                                antibiotics.removeAntibiotik(values.id);
                                 _namaAntibiotik.remove(values);
                               });
                             },
@@ -616,6 +684,7 @@ class _AddPatienAntibiotikState extends State<AddPatienAntibiotik> {
                             height: 30,
                           ),
                           TextFormField(
+                            textInputAction: TextInputAction.next,
                             controller: deskripsiReaksi,
                             decoration: const InputDecoration(
                               labelText: 'Deskripsi reaksi yang muncul',
@@ -692,6 +761,7 @@ class _AddPatienAntibiotikState extends State<AddPatienAntibiotik> {
                             height: 30,
                           ),
                           TextFormField(
+                            textInputAction: TextInputAction.next,
                             controller: deskripsiEfekSamping,
                             decoration: const InputDecoration(
                               labelText: 'Deskripsi efek samping yang muncul',
@@ -736,34 +806,72 @@ class _AddPatienAntibiotikState extends State<AddPatienAntibiotik> {
                           btnCancelOnPress: () {},
                           btnOkOnPress: () {
                             showLoaderDialog(context);
-                            pasien.addPatien().then(
-                              (_) {
-                                Navigator.of(context).pop();
-                                AwesomeDialog(
-                                  context: context,
-                                  dialogType: DialogType.success,
-                                  dismissOnTouchOutside: false,
-                                  animType: AnimType.bottomSlide,
-                                  title: 'Pasien berhasil ditambahkan !',
-                                  autoHide: const Duration(seconds: 3),
-                                  btnOkColor: const Color(0xFF20BDB7),
-                                  onDismissCallback: (e) {
-                                    Navigator.of(context).pushAndRemoveUntil(MaterialPageRoute(builder: (context) =>
-                                        const HomeScreen()), (Route<dynamic> route) => false);
-                                  },
-                                  btnOkOnPress: () {
-                                    Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                        builder: (context) {
-                                          return const HomeScreen();
-                                        },
-                                      ),
-                                    );
-                                  },
-                                ).show();
-                              },
-                            );
+
+                            if (pasien.isEditing) {
+                              pasien.updatePasien().then(
+                                (_) {
+                                  Navigator.of(context).pop();
+                                  AwesomeDialog(
+                                    context: context,
+                                    dialogType: DialogType.success,
+                                    dismissOnTouchOutside: false,
+                                    animType: AnimType.bottomSlide,
+                                    title: 'Pasien berhasil diupdate !',
+                                    autoHide: const Duration(seconds: 3),
+                                    btnOkColor: const Color(0xFF20BDB7),
+                                    onDismissCallback: (e) {
+                                      Navigator.of(context).pushAndRemoveUntil(
+                                          MaterialPageRoute(
+                                              builder: (context) =>
+                                                  const HomeScreen()),
+                                          (Route<dynamic> route) => false);
+                                    },
+                                    btnOkOnPress: () {
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (context) {
+                                            return const HomeScreen();
+                                          },
+                                        ),
+                                      );
+                                    },
+                                  ).show();
+                                },
+                              );
+                            } else {
+                              pasien.addPatien().then(
+                                (_) {
+                                  Navigator.of(context).pop();
+                                  AwesomeDialog(
+                                    context: context,
+                                    dialogType: DialogType.success,
+                                    dismissOnTouchOutside: false,
+                                    animType: AnimType.bottomSlide,
+                                    title: 'Pasien berhasil ditambahkan !',
+                                    autoHide: const Duration(seconds: 3),
+                                    btnOkColor: const Color(0xFF20BDB7),
+                                    onDismissCallback: (e) {
+                                      Navigator.of(context).pushAndRemoveUntil(
+                                          MaterialPageRoute(
+                                              builder: (context) =>
+                                                  const HomeScreen()),
+                                          (Route<dynamic> route) => false);
+                                    },
+                                    btnOkOnPress: () {
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (context) {
+                                            return const HomeScreen();
+                                          },
+                                        ),
+                                      );
+                                    },
+                                  ).show();
+                                },
+                              );
+                            }
                           },
                         ).show();
                       },
@@ -774,9 +882,9 @@ class _AddPatienAntibiotikState extends State<AddPatienAntibiotik> {
                         padding: const EdgeInsets.symmetric(
                             vertical: 15, horizontal: 15),
                       ),
-                      child: const Text(
-                        "Tambah Pasien",
-                        style: TextStyle(
+                      child: Text(
+                        pasien.isEditing ? "Ubah Data Pasien" : "Tambah Pasien",
+                        style: const TextStyle(
                           color: Colors.white,
                         ),
                       ),

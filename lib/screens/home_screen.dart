@@ -28,6 +28,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   void initState() {
+    super.initState();
     setState(() {
       _isLoading = true;
     });
@@ -39,7 +40,6 @@ class _HomeScreenState extends State<HomeScreen> {
         _isLoading = false;
       });
     });
-    super.initState();
   }
 
   Future<void> _refreshPasien(BuildContext context) async {

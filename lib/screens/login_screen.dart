@@ -54,14 +54,9 @@ class _LoginScreenState extends State<LoginScreen> {
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (doctor.loggedIn) {
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(
-            builder: (context) {
-              return const HomeScreen();
-            },
-          ),
-        );
+        Navigator.of(context).pushAndRemoveUntil(
+            MaterialPageRoute(builder: (context) => const HomeScreen()),
+            (Route<dynamic> route) => false);
       }
 
       if (doctor.items.isNotEmpty && doctor.items['msg'] == "fail") {
@@ -71,15 +66,14 @@ class _LoginScreenState extends State<LoginScreen> {
           dismissOnTouchOutside: false,
           animType: AnimType.bottomSlide,
           title: 'Login gagal !',
-          desc: 'Silahkan cek apakah email dan password yang anda masukan benar.',
+          desc:
+              'Silahkan cek apakah email dan password yang anda masukan benar.',
           autoHide: const Duration(seconds: 3),
           btnOkColor: const Color(0xFF20BDB7),
         ).show();
         doctor.items = {};
       }
     });
-
-
 
     return Scaffold(
       body: SingleChildScrollView(

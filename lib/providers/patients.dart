@@ -1,8 +1,10 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:logger/logger.dart';
 
 import '../service/http_service.dart';
 import '../util/data_class.dart';
+import 'package:collection/collection.dart';
 
 class Patiens with ChangeNotifier {
   Map<String, Pasien> _items = {};
@@ -45,7 +47,7 @@ class Patiens with ChangeNotifier {
 
   int? lamaDirawat = null;
 
-  List<AntibiotikSensitif> antibiotikSensitif = [];
+  List<AntibiotikSensitif> antibiotikSensitif = [], antibiotikSensitifDetail = [];
 
   List<PemberianAntibiotik> pemberianAntibiotik = [],
       pemberianAntibiotikDetail = [];
@@ -149,6 +151,9 @@ class Patiens with ChangeNotifier {
     _pasienDetail = {};
     pemberianAntibiotikDetail = [];
     riwayatAntibiotik = [];
+    pemberianAntibiotik = [];
+    antibiotikSensitif = [];
+    antibiotikSensitifDetail = [];
     try {
       final data = await HttpService().getPasienById(id);
       _pasienDetail = data;
@@ -164,6 +169,11 @@ class Patiens with ChangeNotifier {
           .map((e) =>
               Data(id: e['antibiotik']?['id'], name: e['antibiotik']?['name']))
           .toList();
+
+      antibiotikSensitifDetail = ((data['visitasi']['antibiotik_sensitif'] ??
+          []) as List<dynamic>)
+          .map((e) => AntibiotikSensitif(id_antibiotik: e['nama_antibiotik_sensitif']['id']))
+          .toList();
     } catch (error) {
       rethrow;
     }
@@ -178,16 +188,103 @@ class Patiens with ChangeNotifier {
     }
   }
 
+  List<AntibiotikSensitif> _setAntibiotikSensitif(List data) {
+    return data
+        .map((e) => AntibiotikSensitif(
+            id_antibiotik: (e['nama_antibiotik_sensitif']['id'] + 1)))
+        .toList();
+  }
+
+  List<PemberianAntibiotik> _setPemberianAntibiotik(List data) {
+    return data
+        .map((e) => PemberianAntibiotik(
+            id_antibiotik: (e['antibiotik']['id'] + 1),
+            dosis: e['dosis'],
+            jalurPemberian: e['jalur_pemberian'],
+            lamaPemberian: e['lama_pemberian']))
+        .toList();
+  }
+
+  List<PemberianAntibiotik> _cekPemberianAntbiotik() {
+
+    List<PemberianAntibiotik> antibiotikList = _setPemberianAntibiotik(pasienDetail['visitasi']['riwayat_antibiotik']['pemberian_antibiotik']);
+
+    if(pemberianAntibiotik.isEmpty){
+      if(const ListEquality().equals(pemberianAntibiotikDetail, antibiotikList)){
+        return antibiotikList;
+      }
+    }
+
+    return pemberianAntibiotik;
+  }
+
+  List<AntibiotikSensitif> _cekAntbiotikSensitif() {
+
+    List<AntibiotikSensitif> antibiotikList = _setAntibiotikSensitif(pasienDetail['visitasi']['antibiotik_sensitif']);
+
+    if(antibiotikSensitif.isEmpty){
+      if(const ListEquality().equals(antibiotikSensitifDetail, antibiotikList)){
+        return antibiotikList;
+      }
+    }
+
+    return antibiotikSensitif;
+  }
+
   Future<void> updatePasien() async {
     var data = Pasien(
-        name: name ?? pasienDetail['name'],
-        tanggal_lahir: tanggalLahir ?? pasienDetail['tanggal_lahir'],
-        no_hp: noHp ?? pasienDetail['no_hp'].toString(),
-        gender: gender ?? pasienDetail['gender'],
-        alamat: alamat ?? pasienDetail['alamat'],
-        komorbid: komorbid ?? pasienDetail['komorbid']);
+      name: name ?? pasienDetail['name'],
+      tanggal_lahir: tanggalLahir ?? pasienDetail['tanggal_lahir'],
+      no_hp: noHp ?? pasienDetail['no_hp'].toString(),
+      gender: gender ?? pasienDetail['gender'],
+      alamat: alamat ?? pasienDetail['alamat'],
+      komorbid: komorbid ?? pasienDetail['komorbid'],
+      visitasi: Visitasi(
+        dx_sementara: dxSementara ?? pasienDetail['visitasi']['dx_sementara'],
+        dx_definitif: dxDefinitif ?? pasienDetail['visitasi']['dx_definitif'],
+        jenis_perawatan:
+            jenisPerawatan ?? pasienDetail['visitasi']['jenis_perawatan'],
+        lama_dirawat: lamaDirawat ?? pasienDetail['visitasi']['lama_dirawat'],
+        tempat_praktek:
+            tempatPraktek ?? pasienDetail['visitasi']['tempat_praktek'],
+        ruang_rawat: ruangRawat ?? pasienDetail['visitasi']['ruang_rawat'],
+        hasil_bakteri:
+            hasilBakteri ?? pasienDetail['visitasi']['hasil_bakteri'],
+      ),
+      spesimen: spesimenName != null
+          ? Spesimen(
+              name: spesimenName,
+            )
+          : pasienDetail['visitasi']['spesimen']['name'],
+      antibiotik_sensitif: _cekAntbiotikSensitif(),
+      riwayat_antibiotik: RiwayatAntibiotik(
+        kombinasi_antibiotik: kombinasiAntibiotik ??
+            pasienDetail['visitasi']['riwayat_antibiotik']
+                ['kombinasi_antibiotik'],
+        reaksi_obat: reaksiObat ??
+            pasienDetail['visitasi']['riwayat_antibiotik']['reaksi_obat'],
+        efek_samping: efekSamping ??
+            pasienDetail['visitasi']['riwayat_antibiotik']['efek_samping'],
+      ),
+      pemberianAntibiotik: _cekPemberianAntbiotik(),
+    );
 
-    Logger().d(data.komorbid);
+    name = null;
+    tanggalLahir = null;
+    noHp = null;
+    gender = null;
+    alamat = null;
+    komorbid = null;
+    dxSementara = null;
+    dxDefinitif = null;
+    jenisPerawatan = null;
+    tempatPraktek = null;
+    ruangRawat = null;
+    hasilBakteri = null;
+    spesimenName = null;
+    reaksiObat = null;
+    efekSamping = null;
+    lamaDirawat = null;
 
     try {
       await HttpService().updatePasien(data, pasienDetail['id']);

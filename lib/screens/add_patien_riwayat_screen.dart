@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:logger/logger.dart';
 import 'package:multi_select_flutter/chip_display/multi_select_chip_display.dart';
 import 'package:multi_select_flutter/dialog/multi_select_dialog_field.dart';
 import 'package:multi_select_flutter/util/multi_select_item.dart';
@@ -17,7 +18,6 @@ class AddPatienRiwayat extends StatefulWidget {
 }
 
 class _AddPatienRiwayatState extends State<AddPatienRiwayat> {
-  TextEditingController tanggalLahir = TextEditingController();
   TextEditingController dxSementara = TextEditingController();
   TextEditingController dxDefinitif = TextEditingController();
   TextEditingController lamaDirawat = TextEditingController();
@@ -42,7 +42,8 @@ class _AddPatienRiwayatState extends State<AddPatienRiwayat> {
     "Praktek Pribadi/klinik"
   ];
   String _selectedruangRawat = "Ruang Inap",
-      _selectedBakteri = "Borrelia afzelii", _selectedSpesimen = "Ingus";
+      _selectedBakteri = "Borrelia afzelii",
+      _selectedSpesimen = "Ingus";
 
   bool _hasilKulturBakteri = false, _namaAntibiotik = false;
 
@@ -53,41 +54,72 @@ class _AddPatienRiwayatState extends State<AddPatienRiwayat> {
   ];
 
   final List<String> jenisSpesimen = [
-     "Ingus",
-     "Air Kencing",
-     "Darah",
+    "Ingus",
+    "Air Kencing",
+    "Darah",
   ];
 
-  static List<Data> namaAntibiotik = [];
+  static List<Data> _listNamaAntibiotik = [];
+  static List<Data> _editNamaAntibiotik = [];
 
   convertData() {
-    if (namaAntibiotik.isEmpty) {
+    if (_listNamaAntibiotik.isEmpty) {
       for (var i = 0; i < dataAntibiotik.length; i++) {
-        namaAntibiotik.add(Data(id: i, name: dataAntibiotik[i]));
+        _listNamaAntibiotik.add(Data(id: i, name: dataAntibiotik[i]));
       }
     }
   }
 
   List<MultiSelectItem> _itemsNamaAntibiotik = [];
 
+  bool helper = true;
+
   @override
   void initState() {
     super.initState();
     convertData();
     setState(() {
-      _itemsNamaAntibiotik = namaAntibiotik
+      helper = true;
+      _editNamaAntibiotik = [];
+      _itemsNamaAntibiotik = _listNamaAntibiotik
           .map((data) => MultiSelectItem<Data>(data, data.name))
           .toList();
     });
+  }
+
+  void setInitialDataForUpdatingPasien(Map<String, dynamic> data) {
+    dxSementara.text = data["visitasi"]["dx_sementara"];
+    dxDefinitif.text = data["visitasi"]["dx_definitif"];
+    _selectedJenisPerawatan = data["visitasi"]["jenis_perawatan"];
+    lamaDirawat.text = data["visitasi"]["lama_dirawat"].toString();
+    _selectedtempatPraktek = data["visitasi"]["tempat_praktek"];
+    _selectedruangRawat = data["visitasi"]["ruang_rawat"];
+    if (data["visitasi"]["hasil_bakteri"] != null) {
+      _hasilKulturBakteri = true;
+      _selectedSpesimen = data["visitasi"]["spesimen"][0]["name"];
+      _selectedBakteri = data["visitasi"]["hasil_bakteri"];
+    }
+    if ((data["visitasi"]["antibiotik_sensitif"] as List).isNotEmpty) {
+      _namaAntibiotik = true;
+      _editNamaAntibiotik = [];
+      var dataAntibiotik = data["visitasi"]["antibiotik_sensitif"] as List;
+      for (var element in dataAntibiotik) {
+        _editNamaAntibiotik.add(
+            _listNamaAntibiotik[element["nama_antibiotik_sensitif"]["id"] - 1]);
+      }
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     final pasien = Provider.of<Patiens>(context, listen: false);
 
-    tanggalLahir.addListener(() {
-      pasien.tanggalLahir = tanggalLahir.text;
-    });
+    if (pasien.isEditing && helper) {
+      setInitialDataForUpdatingPasien(pasien.pasienDetail);
+      setState(() {
+        helper = false;
+      });
+    }
 
     dxSementara.addListener(() {
       pasien.dxSementara = dxSementara.text;
@@ -107,13 +139,15 @@ class _AddPatienRiwayatState extends State<AddPatienRiwayat> {
     pasien.spesimenName = _selectedSpesimen;
     pasien.hasilBakteri = _namaAntibiotik ? _selectedBakteri : null;
 
+    Logger().d(_editNamaAntibiotik);
+
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
         centerTitle: true,
-        title: const Text(
-          "Tambah Pasien Baru",
-          style: TextStyle(
+        title: Text(
+          pasien.isEditing ? "Ubah Data Pasien" : "Tambah Pasien Baru",
+          style: const TextStyle(
             fontWeight: FontWeight.bold,
           ),
         ),
@@ -150,10 +184,11 @@ class _AddPatienRiwayatState extends State<AddPatienRiwayat> {
                   height: 30,
                 ),
                 TextFormField(
+                  textInputAction: TextInputAction.next,
                   controller: dxSementara,
-                  validator: (value){
-                    if(value != null) {
-                      if(value.isEmpty) {
+                  validator: (value) {
+                    if (value != null) {
+                      if (value.isEmpty) {
                         return "Dx Sementara Tidak Boleh Kosong";
                       }
                     }
@@ -173,10 +208,11 @@ class _AddPatienRiwayatState extends State<AddPatienRiwayat> {
                   height: 30,
                 ),
                 TextFormField(
+                  textInputAction: TextInputAction.next,
                   controller: dxDefinitif,
-                  validator: (value){
-                    if(value != null) {
-                      if(value.isEmpty) {
+                  validator: (value) {
+                    if (value != null) {
+                      if (value.isEmpty) {
                         return "Dx Sementara Tidak Boleh Kosong";
                       }
                     }
@@ -221,7 +257,7 @@ class _AddPatienRiwayatState extends State<AddPatienRiwayat> {
                       value: _selectedJenisPerawatan,
                       items: jenisPerawatan
                           .map((code) =>
-                          DropdownMenuItem(value: code, child: Text(code)))
+                              DropdownMenuItem(value: code, child: Text(code)))
                           .toList(),
                       onChanged: (index) {
                         pasien.jenisPerawatan = index.toString();
@@ -238,13 +274,14 @@ class _AddPatienRiwayatState extends State<AddPatienRiwayat> {
                   height: 30,
                 ),
                 TextFormField(
+                  textInputAction: TextInputAction.next,
                   controller: lamaDirawat,
-                  validator: (value){
-                    if(value != null) {
-                      if(value.isEmpty) {
+                  validator: (value) {
+                    if (value != null) {
+                      if (value.isEmpty) {
                         return "Dx Sementara Tidak Boleh Kosong";
                       }
-                      if(int.tryParse(value) == null) {
+                      if (int.tryParse(value) == null) {
                         return "Lama Dirawat Harus Angka";
                       }
                     }
@@ -290,7 +327,7 @@ class _AddPatienRiwayatState extends State<AddPatienRiwayat> {
                       value: _selectedtempatPraktek,
                       items: tempatPraktek
                           .map((code) =>
-                          DropdownMenuItem(value: code, child: Text(code)))
+                              DropdownMenuItem(value: code, child: Text(code)))
                           .toList(),
                       onChanged: (index) {
                         pasien.tempatPraktek = index.toString();
@@ -332,7 +369,7 @@ class _AddPatienRiwayatState extends State<AddPatienRiwayat> {
                       value: _selectedruangRawat,
                       items: ruangRawat
                           .map((code) =>
-                          DropdownMenuItem(value: code, child: Text(code)))
+                              DropdownMenuItem(value: code, child: Text(code)))
                           .toList(),
                       onChanged: (index) {
                         pasien.ruangRawat = index.toString();
@@ -432,7 +469,7 @@ class _AddPatienRiwayatState extends State<AddPatienRiwayat> {
                             value: _selectedSpesimen,
                             items: jenisSpesimen
                                 .map((code) => DropdownMenuItem(
-                                value: code, child: Text(code)))
+                                    value: code, child: Text(code)))
                                 .toList(),
                             onChanged: (index) {
                               pasien.spesimenName = index.toString();
@@ -474,7 +511,7 @@ class _AddPatienRiwayatState extends State<AddPatienRiwayat> {
                             value: _selectedBakteri,
                             items: dataBakteri
                                 .map((code) => DropdownMenuItem(
-                                value: code, child: Text(code)))
+                                    value: code, child: Text(code)))
                                 .toList(),
                             onChanged: (index) {
                               pasien.hasilBakteri = index.toString();
@@ -562,6 +599,8 @@ class _AddPatienRiwayatState extends State<AddPatienRiwayat> {
                       ),
                       MultiSelectDialogField(
                         items: _itemsNamaAntibiotik,
+                        initialValue: _editNamaAntibiotik,
+                        separateSelectedItems: true,
                         decoration: BoxDecoration(
                           border: Border.all(
                             color: Colors.black38,
@@ -576,7 +615,6 @@ class _AddPatienRiwayatState extends State<AddPatienRiwayat> {
                           Icons.arrow_drop_down,
                         ),
                         chipDisplay: MultiSelectChipDisplay(
-                          items: _itemsNamaAntibiotik,
                           chipColor: const Color(0xFF20BDB7).withOpacity(0.6),
                           textStyle: const TextStyle(
                             color: Colors.white,
@@ -585,9 +623,10 @@ class _AddPatienRiwayatState extends State<AddPatienRiwayat> {
                         ),
                         selectedColor: const Color(0xFF20BDB7),
                         onConfirm: (List index) {
+                          Logger().d(index);
                           pasien.antibiotikSensitif = index
                               .map((e) =>
-                              AntibiotikSensitif(id_antibiotik: (e.id + 1)))
+                                  AntibiotikSensitif(id_antibiotik: (e.id + 1)))
                               .toList();
                         },
                         searchable: true,
@@ -603,7 +642,7 @@ class _AddPatienRiwayatState extends State<AddPatienRiwayat> {
                   children: [
                     ElevatedButton(
                       onPressed: () {
-                        if(_formKey.currentState!.validate()){
+                        if (_formKey.currentState!.validate()) {
                           Navigator.push(
                             context,
                             MaterialPageRoute(

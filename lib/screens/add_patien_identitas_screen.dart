@@ -1,9 +1,7 @@
-import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:project_pak_gusan/providers/patients.dart';
 import 'package:project_pak_gusan/screens/add_patien_riwayat_screen.dart';
-import 'package:project_pak_gusan/screens/profile_patien_screen.dart';
 import 'package:provider/provider.dart';
 
 class AddPatienIdentitas extends StatefulWidget {
@@ -27,7 +25,6 @@ class _AddPatienIdentitasState extends State<AddPatienIdentitas> {
   bool helper = true;
 
   final _formKey = GlobalKey<FormState>();
-
 
   void setInitialDataForUpdatingPasien(Map<String, dynamic> data) {
     nama.text = data["name"];
@@ -107,7 +104,6 @@ class _AddPatienIdentitasState extends State<AddPatienIdentitas> {
 
     pasien.gender = _selectedJenisKelamin;
 
-
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
@@ -152,6 +148,7 @@ class _AddPatienIdentitasState extends State<AddPatienIdentitas> {
                 ),
                 TextFormField(
                   controller: nama,
+                  textInputAction: TextInputAction.next,
                   decoration: const InputDecoration(
                     labelText: 'Nama',
                     border: OutlineInputBorder(
@@ -161,9 +158,9 @@ class _AddPatienIdentitasState extends State<AddPatienIdentitas> {
                     ),
                   ),
                   keyboardType: TextInputType.name,
-                  validator: (value){
-                    if(value != null) {
-                      if(value.isEmpty) {
+                  validator: (value) {
+                    if (value != null) {
+                      if (value.isEmpty) {
                         return "Nama Tidak Boleh Kosong";
                       }
                     }
@@ -174,9 +171,10 @@ class _AddPatienIdentitasState extends State<AddPatienIdentitas> {
                   height: 30,
                 ),
                 TextFormField(
-                  validator: (value){
-                    if(value != null) {
-                      if(value.isEmpty) {
+                  textInputAction: TextInputAction.next,
+                  validator: (value) {
+                    if (value != null) {
+                      if (value.isEmpty) {
                         return "Tanggal Lahir Tidak Boleh Kosong";
                       }
                     }
@@ -194,7 +192,7 @@ class _AddPatienIdentitasState extends State<AddPatienIdentitas> {
                       print(
                           pickedDate); //pickedDate output format => 2021-03-10 00:00:00.000
                       String formattedDate =
-                      DateFormat('dd, MMMM yyyy').format(pickedDate);
+                          DateFormat('dd, MMMM yyyy').format(pickedDate);
                       print(
                           formattedDate); //formatted date output using intl package =>  2021-03-16
                       setState(() {
@@ -218,13 +216,14 @@ class _AddPatienIdentitasState extends State<AddPatienIdentitas> {
                   height: 30,
                 ),
                 TextFormField(
-                  validator: (value){
-                    if(value != null) {
-                      if(value.isEmpty) {
+                  textInputAction: TextInputAction.next,
+                  validator: (value) {
+                    if (value != null) {
+                      if (value.isEmpty) {
                         return "No Hp Tidak Boleh Kosong";
                       }
 
-                      if(int.tryParse(value) == null){
+                      if (int.tryParse(value) == null) {
                         return "No Hp Harus Angka";
                       }
                     }
@@ -270,7 +269,7 @@ class _AddPatienIdentitasState extends State<AddPatienIdentitas> {
                       value: _selectedJenisKelamin,
                       items: jenisKelamin
                           .map((code) =>
-                          DropdownMenuItem(value: code, child: Text(code)))
+                              DropdownMenuItem(value: code, child: Text(code)))
                           .toList(),
                       onChanged: (index) {
                         setState(() {
@@ -287,9 +286,10 @@ class _AddPatienIdentitasState extends State<AddPatienIdentitas> {
                   height: 30,
                 ),
                 TextFormField(
-                  validator: (value){
-                    if(value != null) {
-                      if(value.isEmpty) {
+                  textInputAction: TextInputAction.next,
+                  validator: (value) {
+                    if (value != null) {
+                      if (value.isEmpty) {
                         return "Alamat Tidak Boleh Kosong";
                       }
                     }
@@ -310,9 +310,10 @@ class _AddPatienIdentitasState extends State<AddPatienIdentitas> {
                   height: 30,
                 ),
                 TextFormField(
-                  validator: (value){
-                    if(value != null) {
-                      if(value.isEmpty) {
+                  textInputAction: TextInputAction.next,
+                  validator: (value) {
+                    if (value != null) {
+                      if (value.isEmpty) {
                         return "Komorbid Tidak Boleh Kosong";
                       }
                     }
@@ -338,60 +339,25 @@ class _AddPatienIdentitasState extends State<AddPatienIdentitas> {
                   children: [
                     ElevatedButton(
                       onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) {
+                              return const AddPatienRiwayat();
+                            },
+                          ),
+                        );
 
-                        if(_formKey.currentState!.validate()){
-                          if (pasien.isEditing) {
-                            AwesomeDialog(
-                              context: context,
-                              dialogType: DialogType.warning,
-                              dismissOnTouchOutside: false,
-                              animType: AnimType.bottomSlide,
-                              title: 'Apakah anda yakin ?',
-                              desc: 'Tekan tombol ya untuk melanjutkan',
-                              btnOkText: "Ya, lanjutkan",
-                              btnCancel: TextButton(
-                                child: const Text("cancel"),
-                                onPressed: () {
-                                  Navigator.of(context).pop();
-                                },
-                              ),
-                              btnOkColor: const Color(0xFF20BDB7),
-                              btnCancelOnPress: () {},
-                              btnOkOnPress: () {
-                                showLoaderDialog(context);
-                                pasien.updatePasien().then(
-                                      (_) {
-                                    AwesomeDialog(
-                                      context: context,
-                                      dialogType: DialogType.success,
-                                      dismissOnTouchOutside: false,
-                                      animType: AnimType.bottomSlide,
-                                      title: 'Pasien berhasil diupdate !',
-                                      autoHide: const Duration(seconds: 3),
-                                      btnOkColor: const Color(0xFF20BDB7),
-                                      onDismissCallback: (e) {
-                                        Navigator.of(context).pop();
-                                      },
-                                      btnOkOnPress: () {
-                                        Navigator.pop(context);
-                                      },
-                                    ).show();
-                                  },
-                                );
+                        if (_formKey.currentState!.validate()) {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) {
+                                return const AddPatienRiwayat();
                               },
-                            ).show();
-                          } else {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) {
-                                  return const AddPatienRiwayat();
-                                },
-                              ),
-                            );
-                          }
+                            ),
+                          );
                         }
-
                       },
                       style: ElevatedButton.styleFrom(
                         shape: RoundedRectangleBorder(
@@ -400,9 +366,9 @@ class _AddPatienIdentitasState extends State<AddPatienIdentitas> {
                         padding: const EdgeInsets.symmetric(
                             vertical: 15, horizontal: 15),
                       ),
-                      child: Text(
-                        pasien.isEditing ? "Update" : "Selanjutnya",
-                        style: const TextStyle(
+                      child: const Text(
+                        "Selanjutnya",
+                        style: TextStyle(
                           color: Colors.white,
                         ),
                       ),

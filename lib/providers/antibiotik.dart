@@ -38,6 +38,16 @@ class Antibiotics with ChangeNotifier {
     notifyListeners();
   }
 
+  void removeAllAntibiotik() {
+    _items = [];
+    notifyListeners();
+  }
+
+  void removeAntibiotik(int id) {
+    _items.removeWhere((item) => (item.id_antibiotik! - 1) == id);
+    notifyListeners();
+  }
+
 
 }
 
