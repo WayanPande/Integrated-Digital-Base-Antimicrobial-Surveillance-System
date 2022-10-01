@@ -1,4 +1,6 @@
 
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:logger/logger.dart';
 import 'package:project_pak_gusan/util/data_class.dart';
@@ -55,6 +57,11 @@ class Doctors with ChangeNotifier {
       }
     }
     notifyListeners();
+  }
+
+  Future<void> uploadProfileImage(File file) async {
+    await HttpService().uploadProfileImage(file);
+    getDokter();
   }
 
 }

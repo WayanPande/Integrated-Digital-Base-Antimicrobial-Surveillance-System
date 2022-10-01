@@ -38,6 +38,7 @@ class Doktor {
   String? jenisDokter;
   int? jenisSpesialisId;
   String? lokasiPraktek;
+  String? image;
   int? klinikId;
   int? rumahSakitId;
   int? poliklinikId;
@@ -50,6 +51,7 @@ class Doktor {
         this.jenisDokter,
         this.jenisSpesialisId,
         this.lokasiPraktek,
+        this.image,
         this.klinikId,
         this.rumahSakitId,
         this.poliklinikId,
@@ -62,6 +64,7 @@ class Doktor {
     jenisDokter = json['jenis_dokter'];
     jenisSpesialisId = json['jenis_spesialis_id'];
     lokasiPraktek = json['lokasi_praktek'];
+    image = json['image'];
     klinikId = json['klinik_id'];
     rumahSakitId = json['rumah_sakit_id'];
     poliklinikId = json['poliklinik_id'];
@@ -76,6 +79,7 @@ class Doktor {
     data['jenis_dokter'] = this.jenisDokter;
     data['jenis_spesialis_id'] = this.jenisSpesialisId;
     data['lokasi_praktek'] = this.lokasiPraktek;
+    data['image'] = this.image;
     data['klinik_id'] = this.klinikId;
     data['rumah_sakit_id'] = this.rumahSakitId;
     data['poliklinik_id'] = this.poliklinikId;

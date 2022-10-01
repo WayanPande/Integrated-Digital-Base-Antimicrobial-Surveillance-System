@@ -1,9 +1,12 @@
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:http/http.dart' as http;
+import 'package:logger/logger.dart';
 import 'package:project_pak_gusan/util/data_class.dart';
 import 'package:project_pak_gusan/util/sharedPreferences.dart';
+import 'package:http_parser/http_parser.dart';
 
 class HttpService {
   Future<List<dynamic>> getPasien(String? name) async {
@@ -138,5 +141,30 @@ class HttpService {
     } else {
       throw "Unable to retrieve posts.";
     }
+  }
+
+  Future<int> uploadProfileImage(File file) async {
+    var request = http.MultipartRequest(
+      'POST', Uri.parse("${dotenv.env['API_URL']}dokter/image_upload/${await getDoktorId()}"),
+
+    );
+    Map<String,String> headers={
+      "Content-type": "multipart/form-data"
+    };
+    request.headers.addAll(headers);
+    request.files.add(
+      http.MultipartFile(
+        'image',
+        file.readAsBytes().asStream(),
+        file.lengthSync(),
+        filename: "test${file.path.split('/').last}",
+        contentType: MediaType('image','png')
+      ),
+    );
+
+    Logger().d(request.files);
+
+    var res = await request.send();
+    return res.statusCode;
   }
 }

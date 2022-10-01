@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:logger/logger.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:project_pak_gusan/providers/doctors.dart';
 import 'package:project_pak_gusan/providers/patients.dart';
 import 'package:project_pak_gusan/screens/add_patien_identitas_screen.dart';
@@ -48,8 +48,8 @@ class _HomeScreenState extends State<HomeScreen> {
 
   Future<void> _saveDoctorId(BuildContext context) async {
     var temp = await getDoktorId();
-    setState((){
-      id =  temp ?? 0;
+    setState(() {
+      id = temp ?? 0;
     });
   }
 
@@ -65,6 +65,16 @@ class _HomeScreenState extends State<HomeScreen> {
       pasien.getPasienList(searchText.text);
     }
 
+    String getImageUrl() {
+      if (doctor.dokterDetail.image != null) {
+        if (dotenv.env['API_URL'] != null) {
+          return "${dotenv.env['API_URL']}image_uploads/${doctor.dokterDetail.image}";
+        }
+      } else {
+        return "https://avatars.dicebear.com/api/initials/${doctor.dokterDetail.nama}.jpg";
+      }
+      return "";
+    }
 
     return Scaffold(
       floatingActionButton: FloatingActionButton(
@@ -139,7 +149,7 @@ class _HomeScreenState extends State<HomeScreen> {
                             Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               mainAxisAlignment: MainAxisAlignment.center,
-                              children:  [
+                              children: [
                                 const Text(
                                   "Selamat datang",
                                   style: TextStyle(
@@ -168,8 +178,9 @@ class _HomeScreenState extends State<HomeScreen> {
                               height: 70,
                               decoration: BoxDecoration(
                                 image: DecorationImage(
+                                  fit: BoxFit.cover,
                                   image: NetworkImage(
-                                    "https://avatars.dicebear.com/api/adventurer-neutral/${doctor.dokterDetail.nama ?? ""}.jpg",
+                                    getImageUrl(),
                                   ),
                                 ),
                                 borderRadius: BorderRadius.circular(15),
@@ -180,11 +191,11 @@ class _HomeScreenState extends State<HomeScreen> {
                       ),
                       Row(
                         children: [
-                           Expanded(
+                          Expanded(
                             flex: 5,
                             child: TextFormField(
                               controller: searchText,
-                              onFieldSubmitted: (value){
+                              onFieldSubmitted: (value) {
                                 searchPasien();
                               },
                               textInputAction: TextInputAction.search,
